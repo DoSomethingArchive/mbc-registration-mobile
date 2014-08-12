@@ -15,7 +15,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 require __DIR__ . '/mb-secure-config.inc';
 require __DIR__ . '/mb-config.inc';
 
-require __DIR__ . '/MBC_RegistrationMobile.inc';
+require __DIR__ . '/MBC_RegistrationMobile.class.inc';
 
 // Settings
 $credentials = array(
@@ -35,20 +35,30 @@ $config = array(
   ),
   'queue' => array(
     array(
-      'name' => getenv("MB_REGISTRATION_MOBILE_QUEUE"),
-      'passive' => getenv("MB_REGISTRATION_MOBILE_QUEUE_PASSIVE"),
-      'durable' => getenv("MB_REGISTRATION_MOBILE_QUEUE_DURABLE"),
-      'exclusive' => getenv("MB_REGISTRATION_MOBILE_QUEUE_EXCLUSIVE"),
-      'auto_delete' => getenv("MB_REGISTRATION_MOBILE_QUEUE_AUTO_DELETE"),
-      'bindingKey' => getenv("MB_REGISTRATION_MOBILE_QUEUE_TOPIC_MB_TRANSACTIONAL_EXCHANGE_PATTERN"),
+      'name' => getenv("MB_MOBILE_COMMONS_QUEUE"),
+      'passive' => getenv("MB_MOBILE_COMMONS_QUEUE_PASSIVE"),
+      'durable' => getenv("MB_MOBILE_COMMONS_QUEUE_DURABLE"),
+      'exclusive' => getenv("MB_MOBILE_COMMONS_QUEUE_EXCLUSIVE"),
+      'auto_delete' => getenv("MB_MOBILE_COMMONS_QUEUE_AUTO_DELETE"),
+      'bindingKey' => getenv("MB_MOBILE_COMMONS_QUEUE_TOPIC_MB_TRANSACTIONAL_EXCHANGE_PATTERN"),
     ),
   ),
+  /* Needed for implimenting ack backs
+  'consume' => array(
+    'consumer_tag' => getenv("MB_TRANSACTIONAL_CONSUME_TAG"),
+    'no_local' => getenv("MB_TRANSACTIONAL_CONSUME_NO_LOCAL"),
+    'no_ack' => getenv("MB_TRANSACTIONAL_CONSUME_NO_ACK"),
+    'exclusive' => getenv("MB_TRANSACTIONAL_CONSUME_EXCLUSIVE"),
+    'nowait' => getenv("MB_TRANSACTIONAL_CONSUME_NOWAIT"),
+  ),
+  */
 );
 $settings = array(
   'stathat_ez_key' => getenv("STATHAT_EZKEY"),
 );
 
 echo '------- mbc-registration-mobile START: ' . date('D M j G:i:s T Y') . ' -------', "\n";
+
 
 // Kick off
 $mb = new MessageBroker($credentials, $config);

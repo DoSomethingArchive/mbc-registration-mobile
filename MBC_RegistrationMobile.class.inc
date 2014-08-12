@@ -12,7 +12,6 @@ use DoSomething\MBStatTracker\StatHat;
  */
 class MBC_RegistrationMobile
 {
-
   /**
    * Collect a batch of user registrations for submission to Mobile Commons from
    * the related RabbitMQ queue.
@@ -25,32 +24,53 @@ class MBC_RegistrationMobile
     echo '------- MBC_RegistrationMobile START #' . $payload->delivery_info['delivery_tag'] . ' - ' . date('D M j G:i:s T Y') . ' -------', "\n";
 
     $payloadDetails = unserialize($payload->body);
+    $deliveryTag = $payload->delivery_info['delivery_tag'];
     
     $config = array(
       'username' => getenv("MOBILE_COMMONS_USER"),
-      'password' => getenv("MOBILE_COMMONS_PASSWORD")
+      'password' => getenv("MOBILE_COMMONS_PASSWORD"),
     );
     $MobileCommons = new MobileCommons($config);
     
+    // https://secure.mcommons.com/campaigns/5091/opt_in_paths/170071
     $args = array(
-      /*
-      phone_number (Required)
-      email
-      postal_code
-      first_name
-      last_name
-      street1
-      street2
-      city
-      state
-      country
-      Custom Column (Any custom column name)
-      opt_in_path_id: This will subscribe the user to this campaign and send the message flow in this opt-in path. The value should be your opt-in path key.
-      */
+      'phone_number' => $payloadDetails['mobile'],
+      'opt_in_path_id' => 170071
     );
+
+    if (isset($payloadDetails['email'])) {
+      $args['email'] = $payloadDetails['email'];
+    }
+    if (isset($payloadDetails['zip'])) {
+      $args['postal_code'] = $payloadDetails['zip'];
+    }
+    if (isset($payloadDetails['merge_vars']['FNAME'])) {
+      $args['first_name'] = $payloadDetails['merge_vars']['FNAME'];
+    }
+    if (isset($payloadDetails['merge_vars']['LNAME'])) {
+      $args['last_name'] = $payloadDetails['merge_vars']['LNAME'];
+    }
+    if (isset($payloadDetails['address1'])) {
+      $args['street1'] = $payloadDetails['address1'];
+    }
+    if (isset($payloadDetails['address2'])) {
+      $args['street2'] = $payloadDetails['address2'];
+    }
+    if (isset($payloadDetails['city'])) {
+      $args['city'] = $payloadDetails['city'];
+    }
+    if (isset($payloadDetails['state'])) {
+      $args['state'] = $payloadDetails['state'];
+    }
 
     $profileStatus = $MobileCommons->profiles_update($args);
     
+    /* Need for ack backs
+    if (isset($profileStatus->profile)) {
+      $this->channel->basic_ack($deliveryTag);
+    }
+    */
+
     echo '------- MBC_RegistrationMobile END #' . $payload->delivery_info['delivery_tag'] . ' - result: ' .  $result . ' - ' . date('D M j G:i:s T Y') . ' -------', "\n";
   }
 
