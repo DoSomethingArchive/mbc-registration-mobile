@@ -43,25 +43,23 @@ $config = array(
       'bindingKey' => getenv("MB_MOBILE_COMMONS_QUEUE_TOPIC_MB_TRANSACTIONAL_EXCHANGE_PATTERN"),
     ),
   ),
-  /* Needed for implimenting ack backs
   'consume' => array(
-    'consumer_tag' => getenv("MB_TRANSACTIONAL_CONSUME_TAG"),
-    'no_local' => getenv("MB_TRANSACTIONAL_CONSUME_NO_LOCAL"),
-    'no_ack' => getenv("MB_TRANSACTIONAL_CONSUME_NO_ACK"),
-    'exclusive' => getenv("MB_TRANSACTIONAL_CONSUME_EXCLUSIVE"),
-    'nowait' => getenv("MB_TRANSACTIONAL_CONSUME_NOWAIT"),
+    'consumer_tag' => getenv("MB_MOBILE_COMMONS_CONSUME_TAG"),
+    'no_local' => getenv("MB_MOBILE_COMMONS_CONSUME_NO_LOCAL"),
+    'no_ack' => getenv("MB_MOBILE_COMMONS_CONSUME_NO_ACK"),
+    'exclusive' => getenv("MB_MOBILE_COMMONS_CONSUME_EXCLUSIVE"),
+    'nowait' => getenv("MB_MOBILE_COMMONS_CONSUME_NOWAIT"),
   ),
-  */
 );
 $settings = array(
   'stathat_ez_key' => getenv("STATHAT_EZKEY"),
 );
 
-echo '------- mbc-registration-mobile START: ' . date('D M j G:i:s T Y') . ' -------', "\n";
 
+echo '------- mbc-registration-mobile START: ' . date('D M j G:i:s T Y') . ' -------', "\n";
 
 // Kick off
 $mb = new MessageBroker($credentials, $config);
-$mb->consumeMessage(array(new MBC_RegistrationMobile(), 'consumeRegistrationMobileQueue'));
+$mb->consumeMessage(array(new MBC_RegistrationMobile($mb, $settings), 'consumeRegistrationMobileQueue'));
 
 echo '------- mbc-registration-mobile END: ' . date('D M j G:i:s T Y') . ' -------', "\n";
