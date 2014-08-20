@@ -101,9 +101,7 @@ class MBC_RegistrationMobile
           'password' => getenv("MOBILE_COMMONS_PASSWORD"),
         );
         $MobileCommons = new MobileCommons($config);
-        $profileStatus = $MobileCommons->profiles_update($args);
-
-        echo('profileStatus: ' . $profileStatus . "\n");
+        $MobileCommons->profiles_update($args);
 
         $this->messageBroker->sendAck($payload);
       }
