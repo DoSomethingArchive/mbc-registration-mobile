@@ -103,6 +103,8 @@ class MBC_RegistrationMobile
         $MobileCommons = new MobileCommons($config);
         $profileStatus = $MobileCommons->profiles_update($args);
 
+        echo('profileStatus: ' . $profileStatus . "\n");
+
         $this->messageBroker->sendAck($payload);
       }
       catch (Exception $e) {
@@ -111,7 +113,7 @@ class MBC_RegistrationMobile
 
     }
 
-    echo '------- MBC_RegistrationMobile END #' . $payload->delivery_info['delivery_tag'] . ' - result: ' .  $result . ' - ' . date('D M j G:i:s T Y') . ' -------', "\n";
+    echo '------- MBC_RegistrationMobile END #' . $payload->delivery_info['delivery_tag'] . ' - ' . date('D M j G:i:s T Y') . ' -------', "\n";
   }
 
 }
