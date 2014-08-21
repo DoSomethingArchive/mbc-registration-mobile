@@ -111,7 +111,7 @@ class MBC_RegistrationMobile
 
     }
 
-    echo '------- MBC_RegistrationMobile END #' . $payload->delivery_info['delivery_tag'] . ' - ' . date('D M j G:i:s T Y') . ' -------', "\n";
+    echo '------- MBC_RegistrationMobile END #' . $payload->delivery_info['delivery_tag'] . ' - ' . $payloadDetails['mobile'] . ' - ' . date('D M j G:i:s T Y') . ' -------', "\n";
   }
 
 }
