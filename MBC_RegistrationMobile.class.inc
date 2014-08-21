@@ -102,6 +102,7 @@ class MBC_RegistrationMobile
         );
         $MobileCommons = new MobileCommons($config);
         $MobileCommons->profiles_update($args);
+        echo '------- MBC_RegistrationMobile mobile: ' . $payloadDetails['mobile'] . ' -------', "\n";
 
         $this->messageBroker->sendAck($payload);
       }
@@ -111,7 +112,7 @@ class MBC_RegistrationMobile
 
     }
 
-    echo '------- MBC_RegistrationMobile END #' . $payload->delivery_info['delivery_tag'] . ' - ' . $payloadDetails['mobile'] . ' - ' . date('D M j G:i:s T Y') . ' -------', "\n";
+    echo '------- MBC_RegistrationMobile END #' . $payload->delivery_info['delivery_tag'] . ' - ' . date('D M j G:i:s T Y') . ' -------', "\n";
   }
 
 }
