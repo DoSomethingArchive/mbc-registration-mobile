@@ -116,7 +116,8 @@ class MBC_RegistrationMobile
     elseif (isset($payloadDetails['mobile'])) {
       $this->messageBroker->sendAck($payload);
       $this->statHat->addStatName('non user_welcome-niche mobile');
-    } else {
+    }
+    else {
       $this->messageBroker->sendAck($payload);
       $this->statHat->addStatName('non mobile');
     }
