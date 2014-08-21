@@ -102,15 +102,25 @@ class MBC_RegistrationMobile
         );
         $MobileCommons = new MobileCommons($config);
         $MobileCommons->profiles_update($args);
-        echo '------- MBC_RegistrationMobile mobile: ' . $payloadDetails['mobile'] . ' -------', "\n";
+        echo '------- MBC_RegistrationMobile profiles_update mobile: ' . $payloadDetails['mobile'] . ' -------', "\n";
 
         $this->messageBroker->sendAck($payload);
+        $this->statHat->addStatName('profiles_update user_welcome-niche success');
       }
       catch (Exception $e) {
         trigger_error('mbc-registration-mobile ERROR - Failed to submit "profiles_update" to Mobile Commons API.', E_USER_WARNING);
+        $this->statHat->addStatName('profiles_update user_welcome-niche error');
       }
 
     }
+    elseif (isset($payloadDetails['mobile'])) {
+      $this->messageBroker->sendAck($payload);
+      $this->statHat->addStatName('non user_welcome-niche mobile');
+    } else {
+      $this->messageBroker->sendAck($payload);
+      $this->statHat->addStatName('non mobile');
+    }
+    $this->statHat->reportCount(1);
 
     echo '------- MBC_RegistrationMobile END #' . $payload->delivery_info['delivery_tag'] . ' - ' . date('D M j G:i:s T Y') . ' -------', "\n";
   }
