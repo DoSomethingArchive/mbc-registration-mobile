@@ -59,6 +59,7 @@ class MBC_RegistrationMobile
 
     echo '------- MBC_RegistrationMobile START #' . $payload->delivery_info['delivery_tag'] . ' - ' . date('D M j G:i:s T Y') . ' -------', "\n";
 
+    $this->statHat->clearAddedStatNames();
     $payloadDetails = unserialize($payload->body);
     $deliveryTag = $payload->delivery_info['delivery_tag'];
 
