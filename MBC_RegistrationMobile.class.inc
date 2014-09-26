@@ -103,6 +103,14 @@ class MBC_RegistrationMobile
         );
         $MobileCommons = new MobileCommons($config);
         $status = $MobileCommons->profiles_update($args);
+
+        if (isset($status->error)) {
+          echo 'Error - ' . print_r($status->error, TRUE), "\n";
+          echo 'Submitted: ' . print_r($args, TRUE), "\n\n";
+        }
+
+        // @todo: Watch opted_out_source in response from Mobile Commons
+
         echo '------- MBC_RegistrationMobile profiles_update mobile: ' . $payloadDetails['mobile'] . ' -------', "\n";
 
         $this->messageBroker->sendAck($payload);
