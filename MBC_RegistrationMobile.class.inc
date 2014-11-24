@@ -63,12 +63,19 @@ class MBC_RegistrationMobile
     $payloadDetails = unserialize($payload->body);
     $deliveryTag = $payload->delivery_info['delivery_tag'];
 
-    if ($payloadDetails['activity'] == 'user_welcome-niche' && isset($payloadDetails['mobile'])) {
+    // @todo - remove $payloadDetails['activity'] check when this consumer is to handle all Mobile Commons signups
+    if (($payloadDetails['activity'] == 'user_welcome-niche' || $payloadDetails['activity'] == 'cgg2014_signup') &&
+        isset($payloadDetails['mobile'])) {
 
-      // https://secure.mcommons.com/campaigns/5091/opt_in_paths/170071
+      if (!isset($payloadDetails['mc_opt_in_path_id'])) {
+        // https://secure.mcommons.com/campaigns/5091/opt_in_paths/170071
+        // @todo: Add mc_opt_in_path_id to all produced messages
+        $payloadDetails['mc_opt_in_path_id'] = 170071;
+      }
+
       $args = array(
         'phone_number' => $payloadDetails['mobile'],
-        'opt_in_path_id' => 170071
+        'opt_in_path_id' => $payloadDetails['mc_opt_in_path_id'],
       );
 
       if (isset($payloadDetails['email'])) {
