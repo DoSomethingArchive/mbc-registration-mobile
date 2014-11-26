@@ -102,7 +102,10 @@ class MBC_RegistrationMobile
       if (isset($payloadDetails['state'])) {
         $args['state'] = $payloadDetails['state'];
       }
-      if (isset($payloadDetails['state'])) {
+      if (isset($payloadDetails['country'])) {
+        $args['country'] = $payloadDetails['country'];
+      }
+      elseif (isset($payloadDetails['country_code'])) {
         $args['country'] = $payloadDetails['country_code'];
       }
 
