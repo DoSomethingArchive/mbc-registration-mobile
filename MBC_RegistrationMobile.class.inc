@@ -64,7 +64,7 @@ class MBC_RegistrationMobile
     $deliveryTag = $payload->delivery_info['delivery_tag'];
 
     // @todo - remove $payloadDetails['activity'] check when this consumer is to handle all Mobile Commons signups
-    if (isset($payloadDetails['mobile']) &&
+    if ((isset($payloadDetails['mobile']) &&  $payloadDetails['mobile'] != '') &&
         $payloadDetails['activity'] == 'user_welcome-niche' || $payloadDetails['activity'] == 'cgg2014_signup' || $payloadDetails['activity'] == 'cgg2014_vote') {
 
       if (!isset($payloadDetails['mc_opt_in_path_id'])) {
@@ -119,6 +119,8 @@ class MBC_RegistrationMobile
       if (isset($payloadDetails['candidate_name'])) {
         $args['CGG2014_1st_vote'] = $payloadDetails['candidate_name'];
       }
+
+      echo 'Sent SMS to: ' . print_r($args, TRUE), PHP_EOL;
 
       try {
         $config = array(
