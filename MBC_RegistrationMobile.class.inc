@@ -108,6 +108,17 @@ class MBC_RegistrationMobile
       elseif (isset($payloadDetails['country_code'])) {
         $args['country'] = $payloadDetails['country_code'];
       }
+      if (isset($payloadDetails['birthdate_timestamp'])) {
+        $args['birthdate'] = date('Y-m-d', $payloadDetails['birthdate_timestamp']);
+      }
+      if (isset($payloadDetails['birthdate_timestamp'])) {
+        $args['BirthYear'] = date('Y', $payloadDetails['birthdate_timestamp']);
+      }
+
+      // CGG2014
+      if (isset($payloadDetails['candidate_name'])) {
+        $args['CGG2014_1st_vote'] = $payloadDetails['candidate_name'];
+      }
 
       try {
         $config = array(
