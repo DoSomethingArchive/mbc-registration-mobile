@@ -64,8 +64,8 @@ class MBC_RegistrationMobile
     $deliveryTag = $payload->delivery_info['delivery_tag'];
 
     // @todo - remove $payloadDetails['activity'] check when this consumer is to handle all Mobile Commons signups
-    if ((isset($payloadDetails['mobile']) &&  $payloadDetails['mobile'] != '') &&
-        $payloadDetails['activity'] == 'user_welcome-niche' || $payloadDetails['activity'] == 'cgg2014_signup' || $payloadDetails['activity'] == 'cgg2014_vote') {
+    if ((isset($payloadDetails['mobile']) && $payloadDetails['mobile'] != '') &&
+        ($payloadDetails['activity'] == 'user_welcome-niche' || $payloadDetails['activity'] == 'cgg2014_signup' || $payloadDetails['activity'] == 'cgg2014_vote')) {
 
       if (!isset($payloadDetails['mc_opt_in_path_id'])) {
         // https://secure.mcommons.com/campaigns/5091/opt_in_paths/170071
