@@ -144,6 +144,7 @@ class MBC_RegistrationMobile
       }
       catch (Exception $e) {
         trigger_error('mbc-registration-mobile ERROR - Failed to submit "profiles_update" to Mobile Commons API.', E_USER_WARNING);
+        echo 'Excecption:' . print_r($e, TRUE), PHP_EOL;
         $this->statHat->addStatName('profiles_update user_welcome-niche error');
       }
 
