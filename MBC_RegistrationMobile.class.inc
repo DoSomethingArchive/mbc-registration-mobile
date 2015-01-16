@@ -65,13 +65,10 @@ class MBC_RegistrationMobile
 
     // @todo - remove $payloadDetails['activity'] check when this consumer is to handle all Mobile Commons signups
     if ((isset($payloadDetails['mobile']) && $payloadDetails['mobile'] != '') &&
-        ($payloadDetails['activity'] == 'user_welcome-niche' || $payloadDetails['activity'] == 'cgg2014_signup' || $payloadDetails['activity'] == 'cgg2014_vote')) {
-
-      if (!isset($payloadDetails['mc_opt_in_path_id'])) {
-        // https://secure.mcommons.com/campaigns/5091/opt_in_paths/170071
-        // @todo: Add mc_opt_in_path_id to all produced messages
-        $payloadDetails['mc_opt_in_path_id'] = 170071;
-      }
+        ($payloadDetails['activity'] == 'user_welcome-niche' ||
+         $payloadDetails['activity'] == 'user_import' ||
+         $payloadDetails['activity'] == 'cgg2014_signup' ||
+         $payloadDetails['activity'] == 'cgg2014_vote')) {
 
       $args = array(
         'phone_number' => $payloadDetails['mobile'],
@@ -113,6 +110,12 @@ class MBC_RegistrationMobile
       }
       if (isset($payloadDetails['birthdate_timestamp'])) {
         $args['BirthYear'] = date('Y', $payloadDetails['birthdate_timestamp']);
+      }
+
+      // Set by origin of where user data was collected - typically Message
+      // Broker user import
+      if (isset($payloadDetails['source'])) {
+        $args['source'] = $payloadDetails['source'];
       }
 
       // CGG2014
