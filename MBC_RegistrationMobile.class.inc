@@ -63,7 +63,7 @@ class MBC_RegistrationMobile
     $payloadDetails = unserialize($payload->body);
     $deliveryTag = $payload->delivery_info['delivery_tag'];
 
-    // @todo - remove $payloadDetails['activity'] check when this consumer is to handle all Mobile Commons signups
+    // @todo - remove $payloadDetails['activity'] check when this consumer handles all Mobile Commons signups
     if ((isset($payloadDetails['mobile']) && $payloadDetails['mobile'] != '') &&
         ($payloadDetails['activity'] == 'user_welcome-niche' ||
          $payloadDetails['activity'] == 'user_import' ||
@@ -75,6 +75,7 @@ class MBC_RegistrationMobile
         'opt_in_path_id' => $payloadDetails['mc_opt_in_path_id'],
       );
 
+      // Optional profile details
       if (isset($payloadDetails['email'])) {
         $args['email'] = $payloadDetails['email'];
       }
@@ -111,19 +112,18 @@ class MBC_RegistrationMobile
       if (isset($payloadDetails['birthdate_timestamp'])) {
         $args['BirthYear'] = date('Y', $payloadDetails['birthdate_timestamp']);
       }
-
-      // Set by origin of where user data was collected - typically Message
-      // Broker user import
-      if (isset($payloadDetails['source'])) {
-        $args['source'] = $payloadDetails['source'];
-      }
-
       // CGG2014
       if (isset($payloadDetails['candidate_name'])) {
         $args['CGG2014_1st_vote'] = $payloadDetails['candidate_name'];
       }
 
-      echo 'Sent SMS to: ' . print_r($args, TRUE), PHP_EOL;
+      // Set by origin of where user data was collected - typically Message
+      // Broker user import but could also be external producers
+      if (isset($payloadDetails['source'])) {
+        $args['source'] = $payloadDetails['source'];
+      }
+
+      echo 'Data sent to Mobile Commons: ' . print_r($args, TRUE), PHP_EOL;
 
       try {
         $config = array(
@@ -138,7 +138,8 @@ class MBC_RegistrationMobile
           echo 'Submitted: ' . print_r($args, TRUE), "\n\n";
         }
 
-        // @todo: Watch opted_out_source in response from Mobile Commons
+        // @todo: Watch opted_out_source in response from Mobile Commons to log
+        // possible reason for profile addition/update failing.
 
         echo '------- MBC_RegistrationMobile profiles_update mobile: ' . $payloadDetails['mobile'] . ' -------', "\n";
 
@@ -155,8 +156,9 @@ class MBC_RegistrationMobile
     }
     elseif (isset($payloadDetails['mobile'])) {
       $this->messageBroker->sendAck($payload);
-      $this->statHat->addStatName('non user_welcome-niche mobile');
+      $this->statHat->addStatName('non supported activity with provided mobile');
     }
+    // No moble number found, remove entry from queue and move on
     else {
       $this->messageBroker->sendAck($payload);
       $this->statHat->addStatName('non mobile');
