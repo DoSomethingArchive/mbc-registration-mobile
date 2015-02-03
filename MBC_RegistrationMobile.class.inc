@@ -63,12 +63,8 @@ class MBC_RegistrationMobile
     $payloadDetails = unserialize($payload->body);
     $deliveryTag = $payload->delivery_info['delivery_tag'];
 
-    // @todo - remove $payloadDetails['activity'] check when this consumer handles all Mobile Commons signups
-    if ((isset($payloadDetails['mobile']) && $payloadDetails['mobile'] != '') &&
-        ($payloadDetails['activity'] == 'user_welcome-niche' ||
-         $payloadDetails['activity'] == 'user_import' ||
-         $payloadDetails['activity'] == 'cgg2014_signup' ||
-         $payloadDetails['activity'] == 'cgg2014_vote')) {
+    if (!empty($payloadDetails['mobile']) &&
+        !empty($payloadDetails['mc_opt_in_path_id'])) {
 
       $args = array(
         'phone_number' => $payloadDetails['mobile'],
