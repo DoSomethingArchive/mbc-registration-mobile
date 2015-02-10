@@ -42,9 +42,16 @@ $config = array(
       'auto_delete' => getenv("MB_MOBILE_COMMONS_QUEUE_AUTO_DELETE"),
       'bindingKey' => getenv("MB_MOBILE_COMMONS_QUEUE_TOPIC_MB_TRANSACTIONAL_EXCHANGE_PATTERN"),
     ),
+    array(
+      'name' => getenv("MB_MOBILE_COMMONS_QUEUE"),
+      'passive' => getenv("MB_MOBILE_COMMONS_QUEUE_PASSIVE"),
+      'durable' => getenv("MB_MOBILE_COMMONS_QUEUE_DURABLE"),
+      'exclusive' => getenv("MB_MOBILE_COMMONS_QUEUE_EXCLUSIVE"),
+      'auto_delete' => getenv("MB_MOBILE_COMMONS_QUEUE_AUTO_DELETE"),
+      'bindingKey' => getenv("MB_MOBILE_COMMONS_QUEUE_TOPIC_MB_TRANSACTIONAL_EXCHANGE_CAMPAIGN_PATTERN"),
+    ),
   ),
   'consume' => array(
-    'consumer_tag' => getenv("MB_MOBILE_COMMONS_CONSUME_TAG"),
     'no_local' => getenv("MB_MOBILE_COMMONS_CONSUME_NO_LOCAL"),
     'no_ack' => getenv("MB_MOBILE_COMMONS_CONSUME_NO_ACK"),
     'exclusive' => getenv("MB_MOBILE_COMMONS_CONSUME_EXCLUSIVE"),
