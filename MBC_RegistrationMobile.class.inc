@@ -45,7 +45,7 @@ class MBC_RegistrationMobile
 
     // Stathat
     $this->statHat = new StatHat($this->settings['stathat_ez_key'], 'mbc-registration-mobile:');
-    $this->statHat->setIsProduction(TRUE);
+    $this->statHat->setIsProduction(isset($settings['use_stathat_tracking']) ? $settings['use_stathat_tracking'] : FALSE);
   }
 
   /**
@@ -57,7 +57,7 @@ class MBC_RegistrationMobile
    */
   public function consumeRegistrationMobileQueue($payload) {
 
-    echo '------- MBC_RegistrationMobile START #' . $payload->delivery_info['delivery_tag'] . ' - ' . date('D M j G:i:s T Y') . ' -------', "\n";
+    echo '------- MBC_RegistrationMobile START #' . $payload->delivery_info['delivery_tag'] . ' - ' . date('D M j G:i:s T Y') . ' -------', PHP_EOL;
 
     $this->statHat->clearAddedStatNames();
     $payloadDetails = unserialize($payload->body);
@@ -137,7 +137,7 @@ class MBC_RegistrationMobile
         // @todo: Watch opted_out_source in response from Mobile Commons to log
         // possible reason for profile addition/update failing.
 
-        echo '------- MBC_RegistrationMobile profiles_update mobile: ' . $payloadDetails['mobile'] . ' -------', "\n";
+        echo '-> MBC_RegistrationMobile->profiles_update mobile: ' . $payloadDetails['mobile'] . ' -------', PHP_EOL;
 
         $this->messageBroker->sendAck($payload);
         $this->statHat->addStatName('profiles_update success');
@@ -161,7 +161,7 @@ class MBC_RegistrationMobile
     }
     $this->statHat->reportCount(1);
 
-    echo '------- MBC_RegistrationMobile END #' . $payload->delivery_info['delivery_tag'] . ' - ' . date('D M j G:i:s T Y') . ' -------', "\n";
+    echo '------- MBC_RegistrationMobile END #' . $payload->delivery_info['delivery_tag'] . ' - ' . date('D M j G:i:s T Y') . ' -------', PHP_EOL;
   }
 
 }
