@@ -140,12 +140,12 @@ class MBC_RegistrationMobile
         echo '------- MBC_RegistrationMobile profiles_update mobile: ' . $payloadDetails['mobile'] . ' -------', "\n";
 
         $this->messageBroker->sendAck($payload);
-        $this->statHat->addStatName('profiles_update user_welcome-niche success');
+        $this->statHat->addStatName('profiles_update success');
       }
       catch (Exception $e) {
         trigger_error('mbc-registration-mobile ERROR - Failed to submit "profiles_update" to Mobile Commons API.', E_USER_WARNING);
         echo 'Excecption:' . print_r($e, TRUE), PHP_EOL;
-        $this->statHat->addStatName('profiles_update user_welcome-niche error');
+        $this->statHat->addStatName('profiles_update error');
         $this->messageBroker->sendAck($payload);
       }
 
