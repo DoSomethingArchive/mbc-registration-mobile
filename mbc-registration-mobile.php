@@ -9,13 +9,12 @@
 
 // Load up the Composer autoload magic
 require_once __DIR__ . '/vendor/autoload.php';
+use DoSomething\MB_Toolbox\MB_Configuration;
 
 // Load configuration settings common to the Message Broker system
 // symlinks in the project directory point to the actual location of the files
-require __DIR__ . '/mb-secure-config.inc';
-require __DIR__ . '/mb-config.inc';
-
-require __DIR__ . '/MBC_RegistrationMobile.class.inc';
+require_once __DIR__ . '/messagebroker-config/mb-secure-config.inc';
+require_once __DIR__ . '/MBC_RegistrationMobile.class.inc';
 
 // Settings
 $credentials = array(
@@ -25,41 +24,37 @@ $credentials = array(
   'password' => getenv("RABBITMQ_PASSWORD"),
   'vhost' => getenv("RABBITMQ_VHOST"),
 );
-$config = array(
-  'exchange' => array(
-    'name' => getenv("MB_TRANSACTIONAL_EXCHANGE"),
-    'type' => getenv("MB_TRANSACTIONAL_EXCHANGE_TYPE"),
-    'passive' => getenv("MB_TRANSACTIONAL_EXCHANGE_PASSIVE"),
-    'durable' => getenv("MB_TRANSACTIONAL_EXCHANGE_DURABLE"),
-    'auto_delete' => getenv("MB_TRANSACTIONAL_EXCHANGE_AUTO_DELETE"),
-  ),
-  'queue' => array(
-    array(
-      'name' => getenv("MB_MOBILE_COMMONS_QUEUE"),
-      'passive' => getenv("MB_MOBILE_COMMONS_QUEUE_PASSIVE"),
-      'durable' => getenv("MB_MOBILE_COMMONS_QUEUE_DURABLE"),
-      'exclusive' => getenv("MB_MOBILE_COMMONS_QUEUE_EXCLUSIVE"),
-      'auto_delete' => getenv("MB_MOBILE_COMMONS_QUEUE_AUTO_DELETE"),
-      'bindingKey' => getenv("MB_MOBILE_COMMONS_QUEUE_TOPIC_MB_TRANSACTIONAL_EXCHANGE_PATTERN"),
-    ),
-    array(
-      'name' => getenv("MB_MOBILE_COMMONS_QUEUE"),
-      'passive' => getenv("MB_MOBILE_COMMONS_QUEUE_PASSIVE"),
-      'durable' => getenv("MB_MOBILE_COMMONS_QUEUE_DURABLE"),
-      'exclusive' => getenv("MB_MOBILE_COMMONS_QUEUE_EXCLUSIVE"),
-      'auto_delete' => getenv("MB_MOBILE_COMMONS_QUEUE_AUTO_DELETE"),
-      'bindingKey' => getenv("MB_MOBILE_COMMONS_QUEUE_TOPIC_MB_TRANSACTIONAL_EXCHANGE_CAMPAIGN_PATTERN"),
-    ),
-  ),
-  'consume' => array(
-    'no_local' => getenv("MB_MOBILE_COMMONS_CONSUME_NO_LOCAL"),
-    'no_ack' => getenv("MB_MOBILE_COMMONS_CONSUME_NO_ACK"),
-    'exclusive' => getenv("MB_MOBILE_COMMONS_CONSUME_EXCLUSIVE"),
-    'nowait' => getenv("MB_MOBILE_COMMONS_CONSUME_NOWAIT"),
-  ),
-);
 $settings = array(
   'stathat_ez_key' => getenv("STATHAT_EZKEY"),
+);
+
+$config = array();
+$source = __DIR__ . '/messagebroker-config/mb_config.json';
+$mb_config = new MB_Configuration($source, $settings);
+$transactionalExchange = $mb_config->exchangeSettings('transactionalExchange');
+
+$config['exchange'] = array(
+  'name' => $transactionalExchange->name,
+  'type' => $transactionalExchange->type,
+  'passive' => $transactionalExchange->passive,
+  'durable' => $transactionalExchange->durable,
+  'auto_delete' => $transactionalExchange->auto_delete,
+);
+foreach ($transactionalExchange->queues->mobileCommonsQueue->binding_patterns as $bindingCount => $bindingKey) {
+  $config['queue'][$bindingCount] = array(
+    'name' => $transactionalExchange->queues->mobileCommonsQueue->name,
+    'passive' => $transactionalExchange->queues->mobileCommonsQueue->passive,
+    'durable' =>  $transactionalExchange->queues->mobileCommonsQueue->durable,
+    'exclusive' =>  $transactionalExchange->queues->mobileCommonsQueue->exclusive,
+    'auto_delete' =>  $transactionalExchange->queues->mobileCommonsQueue->auto_delete,
+    'bindingKey' => $bindingKey,
+  );
+}
+$config['consume'] = array(
+  'no_local' => $transactionalExchange->queues->mobileCommonsQueue->consume->no_local,
+  'no_ack' => $transactionalExchange->queues->mobileCommonsQueue->consume->no_ack,
+  'nowait' => $transactionalExchange->queues->mobileCommonsQueue->consume->nowait,
+  'exclusive' => $transactionalExchange->queues->mobileCommonsQueue->consume->exclusive,
 );
 
 
