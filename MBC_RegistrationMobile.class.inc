@@ -108,9 +108,16 @@ class MBC_RegistrationMobile
       if (isset($payloadDetails['birthdate_timestamp'])) {
         $args['BirthYear'] = date('Y', $payloadDetails['birthdate_timestamp']);
       }
+
       // CGG2014
-      if (isset($payloadDetails['candidate_name'])) {
+      if (strtoupper($payloadDetails['application_id']) == 'CGG2014' && isset($payloadDetails['candidate_name'])) {
         $args['CGG2014_1st_vote'] = $payloadDetails['candidate_name'];
+      }
+      // AGG2015
+      if (strtoupper($payloadDetails['application_id']) == 'AGG' && isset($payloadDetails['candidate_name'])) {
+        $args['AGG2015_1st_vote'] = $payloadDetails['candidate_name'];
+        $args['AGG2015_1st_vote_id'] = $payloadDetails['candidate_id'];
+        $args['AGG2015_1st_vote_gender'] = $payloadDetails['merge_vars']['GENDER'];
       }
 
       // Set by origin of where user data was collected - typically Message
