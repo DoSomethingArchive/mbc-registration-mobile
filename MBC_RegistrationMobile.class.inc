@@ -117,7 +117,7 @@ class MBC_RegistrationMobile
       if (strtoupper($payloadDetails['application_id']) == 'AGG' && isset($payloadDetails['candidate_name'])) {
         $args['AGG2015_1st_vote'] = $payloadDetails['candidate_name'];
         $args['AGG2015_1st_vote_id'] = $payloadDetails['candidate_id'];
-        $args['AGG2015_1st_vote_gender'] = $payloadDetails['merge_vars']['GENDER'];
+        $args['AGG2015_1st_vote_gender'] = $payloadDetails['candidate_gender'];
       }
 
       // Set by origin of where user data was collected - typically Message
