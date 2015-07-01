@@ -81,6 +81,9 @@ class MBC_RegistrationMobile
       if (isset($payloadDetails['merge_vars']['FNAME'])) {
         $args['first_name'] = $payloadDetails['merge_vars']['FNAME'];
       }
+      elseif ($payloadDetails['first_name']) {
+        $args['first_name'] = $payloadDetails['first_name'];
+      }
       if (isset($payloadDetails['merge_vars']['LNAME'])) {
         $args['last_name'] = $payloadDetails['merge_vars']['LNAME'];
       }
