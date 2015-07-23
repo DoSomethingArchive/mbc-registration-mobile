@@ -63,7 +63,7 @@ class MBC_RegistrationMobile
     $payloadDetails = unserialize($payload->body);
     $deliveryTag = $payload->delivery_info['delivery_tag'];
 
-    if (!empty($payloadDetails['mobile']) &&
+    if (!empty($payloadDetails['mobile'] || !empty($payloadDetails['mobile_number'])) &&
         !empty($payloadDetails['mc_opt_in_path_id'])) {
 
       $args = array(
