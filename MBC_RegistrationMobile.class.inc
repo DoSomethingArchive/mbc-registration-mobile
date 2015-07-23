@@ -66,6 +66,7 @@ class MBC_RegistrationMobile
     if (!empty($payloadDetails['mobile'] || !empty($payloadDetails['mobile_number'])) &&
         !empty($payloadDetails['mc_opt_in_path_id'])) {
 
+      $payloadDetails['mobile'] = isset($payloadDetails['mobile']) ? $payloadDetails['mobile'] : $payloadDetails['mobile_number'];
       $args = array(
         'phone_number' => $payloadDetails['mobile'],
         'opt_in_path_id' => $payloadDetails['mc_opt_in_path_id'],
