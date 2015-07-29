@@ -16,7 +16,7 @@ class MBC_RegistrationMobileConsumer extends MB_Toolbox_BaseConsumer
 {
 
   /**
-   * Values submitted in the potential mobile activity.
+   * Values submitted in potential mobile activity.
    */
   protected $mobileSubmission;
 
@@ -38,10 +38,10 @@ class MBC_RegistrationMobileConsumer extends MB_Toolbox_BaseConsumer
       
       // Instantiation of service provider based on affiliate
       if ($this->mobileSubmission['application_id'] == 'US') {
-        $mobileService = new MBC_RegistrationMobile_MobileCommons($this->messageBroker,  $this->statHat,  $this->toolbox, $this->settings);
+        $mobileService = new MBC_RegistrationMobileService_MobileCommons($this->messageBroker,  $this->statHat,  $this->toolbox, $this->settings, $this->mobileSubmission['opt_in_path_id']);
       }
       elseif  ($this->mobileSubmission['application_id'] == 'CA') {
-        $mobileService  = new MBC_RegistrationMobile_MobileCommons($this->messageBroker,  $this->statHat,  $this->toolbox, $this->settings);
+        $mobileService  = new MBC_RegistrationMobileService_MobileCommons($this->messageBroker,  $this->statHat,  $this->toolbox, $this->settings, $this->mobileSubmission['opt_in_path_id']);
       }
       
       if ($mobileService->canProcess($this->mobileSubmission)) {
@@ -70,11 +70,13 @@ class MBC_RegistrationMobileConsumer extends MB_Toolbox_BaseConsumer
 
     $this->mobileSubmission['application_id'] = $message['application_id'];
 
+    // Set by origin of where user data was collected - typically Message
+    // Broker user import but could also be external producers
+    if (isset($message['source'])) {
+      $this->mobileSubmission['source'] = $message['source'];
+    }
     if (isset($message['mobile'])) {
       $this->mobileSubmission['mobile'] = $message['mobile'];
-    }
-    if (isset($message['opt_in_path_id'])) {
-      $this->mobileSubmission['service_path_id'] = $message['opt_in_path_id'];
     }
 
     // Optional user details
@@ -120,17 +122,9 @@ class MBC_RegistrationMobileConsumer extends MB_Toolbox_BaseConsumer
    */
   protected function canProcess() {
     
+    // Only process United States and Canadian messages
     if ($this->mobileSubmission['application_id'] != 'US' && $this->mobileSubmission['application_id'] == 'CA') {
       echo '** Unsupported affiliate country: ' . $this->mobileSubmission['application_id'] . ', ' . $this->mobileSubmission['phone_number'] . ' not submitted to a mobile service.', PHP_EOL;
-      return FALSE;
-    }
-    
-    if (!isset($this->mobileSubmission['mobile'])) {
-      echo '** Phone number not found in message, skip processing.', PHP_EOL;
-      return FALSE;
-    }
-    if (!isset($this->mobileSubmission['service_path_id'])) {
-      echo '** service_path_id (opt in) not found in message, skip processing.', PHP_EOL;
       return FALSE;
     }
 
