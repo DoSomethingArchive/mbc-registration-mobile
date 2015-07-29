@@ -1,5 +1,5 @@
 <?php
-namespace DoSomething\MBC_ImageProcessor;
+namespace DoSomething\MBC_RegistrationMobile;
 
 use DoSomething\StatHat\Client as StatHat;
 use DoSomething\MB_Toolbox\MB_Toolbox;
@@ -16,9 +16,9 @@ class MBC_RegistrationMobileConsumer extends MB_Toolbox_BaseConsumer
 {
 
   /**
-   * The image and http path to request.
+   * Values submitted in the potential mobile activity.
    */
-  protected $imagePath;
+  protected $mobileSubmission;
 
   /**
    * Initial method triggered by blocked call in mbc-registration-mobile.php. The $payload is the
@@ -67,10 +67,16 @@ class MBC_RegistrationMobileConsumer extends MB_Toolbox_BaseConsumer
    *  The payload of the message being processed.
    */
   protected function setter($message) {
-    
-    $this->mobileSubmission['phone_number'] = $message['mobile'];
-    $this->mobileSubmission['service_path_id'] = $message['opt_in_path_id'];
-    
+
+    $this->mobileSubmission['application_id'] = $message['application_id'];
+
+    if (isset($message['mobile'])) {
+      $this->mobileSubmission['mobile'] = $message['mobile'];
+    }
+    if (isset($message['opt_in_path_id'])) {
+      $this->mobileSubmission['service_path_id'] = $message['opt_in_path_id'];
+    }
+
     // Optional user details
     if (isset($message['email'])) {
       $this->mobileSubmission['email'] = $message['email'];
@@ -81,26 +87,54 @@ class MBC_RegistrationMobileConsumer extends MB_Toolbox_BaseConsumer
     elseif ($payloadDetails['first_name']) {
       $this->mobileSubmission['first_name'] = $payloadDetails['first_name'];
     }
-    
+    if (isset($message['merge_vars']['LNAME'])) {
+      $this->mobileSubmission['last_name'] = $message['merge_vars']['LNAME'];
+    }
 
-    $this->application_id = $message['application_id'];
+    if (isset($message['address1'])) {
+      $this->mobileSubmission['address1'] = $message['address1'];
+    }
+    if (isset($message['address2'])) {
+      $this->mobileSubmission['address2'] = $message['address2'];
+    }
+    if (isset($message['city'])) {
+      $this->mobileSubmission['city'] = $message['city'];
+    }
+    if (isset($message['state'])) {
+      $this->mobileSubmission['state'] = $message['state'];
+    }
+    if (isset($message['country'])) {
+      $this->mobileSubmission['country'] = $message['country'];
+    }
+    if (isset($message['zip'])) {
+      $this->mobileSubmission['postal_code'] = $message['zip'];
+    }
 
-    $this->imagePath = $imagePath;
   }
   
   /**
-   * Method to determine if message can be processed.
+   * Method to determine if message can be processed. Tests based on available service details and
+   * requirements of the current services.
+   *
+   * @retun boolean
    */
   protected function canProcess() {
     
-    if ($this->user['application_id'] != 'US' && $this->user['application_id'] == 'CA') {
-      echo '** Unsupported affiliate country: ' . $this->user['application_id'] . ', ' . $this->user['phone_number'] . ' not submitted to a mobile service.', PHP_EOL;
+    if ($this->mobileSubmission['application_id'] != 'US' && $this->mobileSubmission['application_id'] == 'CA') {
+      echo '** Unsupported affiliate country: ' . $this->mobileSubmission['application_id'] . ', ' . $this->mobileSubmission['phone_number'] . ' not submitted to a mobile service.', PHP_EOL;
       return FALSE;
     }
     
-    if (!isset($this->user['phone_number'])) {
+    if (!isset($this->mobileSubmission['mobile'])) {
+      echo '** Phone number not found in message, skip processing.', PHP_EOL;
       return FALSE;
     }
+    if (!isset($this->mobileSubmission['service_path_id'])) {
+      echo '** service_path_id (opt in) not found in message, skip processing.', PHP_EOL;
+      return FALSE;
+    }
+
+    return TRUE;
   }
 
   /**
