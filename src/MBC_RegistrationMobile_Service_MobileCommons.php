@@ -104,6 +104,34 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
    */
   private function process() {
     
+    try {
+      $config = array(
+        'username' => getenv("MOBILE_COMMONS_USER"),
+        'password' => getenv("MOBILE_COMMONS_PASSWORD"),
+      );
+      $MobileCommons = new MobileCommons($config);
+      $status = $MobileCommons->profiles_update($args);
+
+      if (isset($status->error)) {
+        echo 'Error - ' . print_r($status->error, TRUE), "\n";
+        echo 'Submitted: ' . print_r($args, TRUE), "\n\n";
+      }
+
+      // @todo: Watch opted_out_source in response from Mobile Commons to log
+      // possible reason for profile addition/update failing.
+
+      echo '-> MBC_RegistrationMobile->profiles_update mobile: ' . $payloadDetails['mobile'] . ' -------', PHP_EOL;
+
+      $this->messageBroker->sendAck($payload);
+      $this->statHat->addStatName('profiles_update success');
+    }
+    catch (Exception $e) {
+      trigger_error('mbc-registration-mobile ERROR - Failed to submit "profiles_update" to Mobile Commons API.', E_USER_WARNING);
+      echo 'Excecption:' . print_r($e, TRUE), PHP_EOL;
+      $this->statHat->addStatName('profiles_update error');
+      $this->messageBroker->sendAck($payload);
+    }
+
   }
 
 }
