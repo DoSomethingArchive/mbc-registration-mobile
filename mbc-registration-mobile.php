@@ -28,7 +28,8 @@ $sh = new StatHat([
 ]);
 $tb = new MB_Toolbox($settings);
 
+
 // Kick off - block, wait for messages in queue
 echo '------- mbc-registration-mobile START - ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
-$mb->consumeMessage(array(new MBC_RegistrationMobile($mb, $sh, $tb, $settings), 'consumeRegistrationMobileQueue'));
+$mb->consumeMessage(array(new MBC_RegistrationMobileConsumer($mb, $sh, $tb, $settings), 'consumeRegistrationMobileQueue'));
 echo '------- mbc-registration-mobile END - ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
