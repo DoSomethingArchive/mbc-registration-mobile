@@ -22,8 +22,12 @@ $credentials = array(
 $settings = array(
   'stathat_ez_key' => getenv("STATHAT_EZKEY"),
   'stathat_disable_tracking' => getenv('DISABLE_STAT_TRACKING'),
-  'mb_user_api_host' => getenv('MB_USER_API_HOST'),
-  'mb_user_api_port' => getenv('MB_USER_API_PORT'),
+  'mobile_commons_us_user' => getenv("MOBILE_COMMONS_US_USER"),
+  'mobile_commons_us_password' => getenv("MOBILE_COMMONS_US_PASSWORD"),
+  'mobile_commons_us_company_key' => getenv("MOBILE_COMMONS_US_COMPANY_KEY"),
+  'mobile_commons_ca_user' => getenv("MOBILE_COMMONS_CA_USER"),
+  'mobile_commons_ca_password' => getenv("MOBILE_COMMONS_CA_PASSWORD"),
+  'mobile_commons_ca_company_key' => getenv("MOBILE_COMMONS_CA_COMPANY_KEY"),
 );
 
 $mbConfig = new MB_Configuration($settings, CONFIG_PATH . '/mb_config.json');
