@@ -4,7 +4,6 @@ namespace DoSomething\MBC_RegistrationMobile;
 use DoSomething\StatHat\Client as StatHat;
 use DoSomething\MB_Toolbox\MB_Toolbox;
 use DoSomething\MB_Toolbox\MB_Toolbox_BaseConsumer;
-use DoSomething\MBC_RegistrationMobile\MBC_RegistrationMobile;
 
 /*
  * MBC_RegistrationMobileConsumer.class.in: Used to process the mobileCommonsQueue
@@ -12,7 +11,7 @@ use DoSomething\MBC_RegistrationMobile\MBC_RegistrationMobile;
  * for different mobile services by affiliate is based on message application_id
  * (affiliate country) resulting in in instantiation of the appropreate service class.
  */
-class MBC_RegistrationMobileConsumer extends MB_Toolbox_BaseConsumer
+class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
 {
 
   /**
@@ -36,17 +35,11 @@ class MBC_RegistrationMobileConsumer extends MB_Toolbox_BaseConsumer
     
     if ($this->canProcess()) {
       
-      // Instantiation of service provider based on affiliate
-      if ($this->mobileSubmission['application_id'] == 'US') {
-        $mobileService = new MBC_RegistrationMobileService_MobileCommons($this->messageBroker,  $this->statHat,  $this->toolbox, $this->settings, $this->mobileSubmission['opt_in_path_id']);
-      }
-      elseif  ($this->mobileSubmission['application_id'] == 'CA') {
-        $mobileService  = new MBC_RegistrationMobileService_MobileCommons($this->messageBroker,  $this->statHat,  $this->toolbox, $this->settings, $this->mobileSubmission['opt_in_path_id']);
-      }
+      $mobileService = new MBC_RegistrationMobile_Service($this->messageBroker,  $this->statHat,  $this->toolbox, $this->settings, $this->mobileSubmission['application_id']);
       
       if ($mobileService->canProcess($this->mobileSubmission)) {
-        $mobileService->setter($this->mobileSubmission);
-        $mobileService->process();
+        $mobileService::setter($this->mobileSubmission);
+        $mobileService::process();
         
         // Log processing of mobile user
         // $ip->log();
@@ -55,6 +48,9 @@ class MBC_RegistrationMobileConsumer extends MB_Toolbox_BaseConsumer
       // Destructor
       unset($mobileService);
       
+    }
+    else {
+      // ack maessage
     }
 
     echo '- mbc-registration-mobile - MBC_RegistrationMobileConsumer->consumeRegistrationMobileQueue() END', PHP_EOL;
@@ -68,7 +64,9 @@ class MBC_RegistrationMobileConsumer extends MB_Toolbox_BaseConsumer
    */
   protected function setter($message) {
 
-    $this->mobileSubmission['application_id'] = $message['application_id'];
+    if (isset($message['application_id'])) {
+      $this->mobileSubmission['application_id'] = $message['application_id'];
+    }
 
     // Set by origin of where user data was collected - typically Message
     // Broker user import but could also be external producers
@@ -115,15 +113,14 @@ class MBC_RegistrationMobileConsumer extends MB_Toolbox_BaseConsumer
   }
   
   /**
-   * Method to determine if message can be processed. Tests based on available service details and
-   * requirements of the current services.
+   * Method to determine if message can / should be processed. Conditions based on business
+   * logic for member's mobile numbers.
    *
    * @retun boolean
    */
   protected function canProcess() {
     
-    // Only process United States and Canadian messages
-    if ($this->mobileSubmission['application_id'] != 'US' && $this->mobileSubmission['application_id'] == 'CA') {
+    if (isset($this->mobileSubmission['application_id']) && $this->mobileSubmission['application_id'] != 'US' && $this->mobileSubmission['application_id'] == 'CA') {
       echo '** Unsupported affiliate country: ' . $this->mobileSubmission['application_id'] . ', ' . $this->mobileSubmission['phone_number'] . ' not submitted to a mobile service.', PHP_EOL;
       return FALSE;
     }
