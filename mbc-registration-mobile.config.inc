@@ -27,14 +27,24 @@ $mbConfig->setProperty('rabbit_config', $mbRabbitConfig);
 
 $mbConfig->setProperty('mobileCommons_config', array(
   'US' => array(
-    'user' => getenv("MOBILE_COMMONS_US_USER"),
+    'username' => getenv("MOBILE_COMMONS_US_USER"),
     'password' => getenv("MOBILE_COMMONS_US_PASSWORD"),
-    'compant' => getenv("MOBILE_COMMONS_US_COMPANY_KEY"),
+    'company_key' => getenv("MOBILE_COMMONS_US_COMPANY_KEY"),
+  ),
+  'CGG' => array(
+    'username' => getenv("MOBILE_COMMONS_US_USER"),
+    'password' => getenv("MOBILE_COMMONS_US_PASSWORD"),
+    'company_key' => getenv("MOBILE_COMMONS_US_COMPANY_KEY"),
+  ),
+  'AGG' => array(
+    'username' => getenv("MOBILE_COMMONS_US_USER"),
+    'password' => getenv("MOBILE_COMMONS_US_PASSWORD"),
+    'company_key' => getenv("MOBILE_COMMONS_US_COMPANY_KEY"),
   ),
   'CA' => array(
-    'user' => getenv("MOBILE_COMMONS_CA_USER"),
+    'username' => getenv("MOBILE_COMMONS_CA_USER"),
     'password' => getenv("MOBILE_COMMONS_CA_PASSWORD"),
-    'compant' => getenv("MOBILE_COMMONS_CA_COMPANY_KEY"),
+    'company_key' => getenv("MOBILE_COMMONS_CA_COMPANY_KEY"),
   )
 ));
 
