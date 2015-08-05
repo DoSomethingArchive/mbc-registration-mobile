@@ -35,7 +35,8 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
     
     if (self::canProcess($this->mobileMessage)) {
       
-      $mobileService = new MBC_RegistrationMobile_Service($this->mobileMessage);
+      $mobileServiceDirector = new MBC_RegistrationMobile_ServiceDirector($this->mobileMessage);
+      $mobileService = $mobileServiceDirector->getService();
       
       if ($mobileService->canProcess($this->mobileMessage)) {
         $mobileService->setter($this->mobileMessage);
