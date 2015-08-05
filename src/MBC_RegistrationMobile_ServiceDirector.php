@@ -3,14 +3,13 @@
 namespace DoSomething\MBC_RegistrationMobile;
 
 use DoSomething\StatHat\Client as StatHat;
-use DoSomething\MB_Toolbox\MB_Toolbox;
-use DoSomething\MBC_RegistrationMobile\MBC_RegistrationMobile_BaseService;
+use DoSomething\MB_Toolbox\MB_Configuration;
 
 /*
  * MBC_RegistrationMobile_Service_MobileCommons: Used to process the mobileCommonsQueue
  * entries for the Mobile Commons service.
  */
-class  MBC_RegistrationMobile_Service extends MBC_RegistrationMobile_BaseService
+class  MBC_RegistrationMobile_ServiceDirector
 {
 
   /**
@@ -26,42 +25,16 @@ class  MBC_RegistrationMobile_Service extends MBC_RegistrationMobile_BaseService
    */
   public function __construct($message) {
 
-    parent::__construct($message);
-    $this->mobileService = $this->connectService($message);
-  }
-
-  /**
-   * Method to determine if message can be processed. Tests based on requirements of the service.
-   *
-   * @param array $message
-   *  The payload of the unseralized message being processed.
-   *
-   * @retun boolean
-   */
-  public function canProcess($message) {
-    return $this->mobileService->canProcess($message);
-  }
-
-  /**
-   * Sets values for processing based on contents of message from consumed queue.
-   *
-   * @param array $message
-   *  The payload of the unseralized message being processed.
-   */
-  public function setter($message) {
-    $this->mobileService->setter($message);
-  }
-
-  /**
-   * Process message from consumed queue.
-   */
-  public function process() {
-    $this->mobileService->process();
+    $this->mbConfig = MB_Configuration::getInstance();
+    $this->statHat = $this->mbConfig->getProperty('statHat');
+    
+    $this->mobileService = $mobileServiceDirector->connectService($this->message);
   }
   
   /**
    * connectService: instantiate object for mobile service based on the
-   * country code.
+   * country code. Different service providers can be supported by instantiating an object specific to the message application. Currently only Mobile Commons is
+   * supported.
    *
    * @parm string $message
    *   Two letter country code based on the "application_id" value in
@@ -70,12 +43,7 @@ class  MBC_RegistrationMobile_Service extends MBC_RegistrationMobile_BaseService
    * @return object $mobileServiceObject
    *   An obect of a mobile service.
    */
-  protected function connectService($message) {
-    
-    $bla = FALSE;
-if ($bla) {
-  $bla = TRUE;
-}
+  public function connectService($message) {
 
     switch ($message['application_id']) {
 
@@ -97,6 +65,16 @@ if ($bla) {
     }
 
     return $mobileService;
+  }
+
+  /**
+   * getService: Provide object of SMS service provider.
+   *
+   * @return object $mobileServiceObject
+   *   An obect of a mobile service.
+   */
+  public function gettService() {
+    return $this->mobileService;
   }
 
 }
