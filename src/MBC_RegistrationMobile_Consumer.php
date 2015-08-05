@@ -15,9 +15,9 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
 {
 
   /**
-   * Values submitted in potential mobile activity.
+   * Values submitted in potential mobile activity message.
    */
-  protected $mobileSubmission;
+  protected $mobileMessage;
 
   /**
    * Initial method triggered by blocked call in mbc-registration-mobile.php. The $payload is the
@@ -28,18 +28,18 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
    */
   public function consumeRegistrationMobileQueue($payload) {
 
-    echo '- mbc-registration-mobile - MBC_RegistrationMobileConsumer->consumeRegistrationMobileQueue() START', PHP_EOL;
+    echo '- mbc-registration-mobile - MBC_RegistrationMobile_Consumer->consumeRegistrationMobileQueue() START', PHP_EOL;
 
     parent::consumeQueue($payload);
     $this->setter($this->message);
     
-    if ($this->canProcess()) {
+    if (self::canProcess($this->mobileMessage)) {
       
-      $mobileService = new MBC_RegistrationMobile_Service($this->messageBroker,  $this->statHat,  $this->toolbox, $this->settings, $this->mobileSubmission['application_id']);
+      $mobileService = new MBC_RegistrationMobile_Service($this->mobileMessage);
       
-      if ($mobileService->canProcess($this->mobileSubmission)) {
-        $mobileService::setter($this->mobileSubmission);
-        $mobileService::process();
+      if ($mobileService->canProcess($this->mobileMessage)) {
+        $mobileService->setter($this->mobileMessage);
+        $mobileService->process();
         
         // Log processing of mobile user
         // $ip->log();
@@ -53,7 +53,7 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
       // ack maessage
     }
 
-    echo '- mbc-registration-mobile - MBC_RegistrationMobileConsumer->consumeRegistrationMobileQueue() END', PHP_EOL;
+    echo '- mbc-registration-mobile - MBC_RegistrationMobile_Consumer->consumeRegistrationMobileQueue() END', PHP_EOL;
   }
 
   /**
@@ -64,64 +64,95 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
    */
   protected function setter($message) {
 
+    $this->mobileMessage['original'] = $message['original'];
+    $this->mobileMessage['payload'] = $message['payload'];
+
     if (isset($message['application_id'])) {
-      $this->mobileSubmission['application_id'] = $message['application_id'];
+      $this->mobileMessage['application_id'] = $message['application_id'];
     }
 
     // Set by origin of where user data was collected - typically Message
     // Broker user import but could also be external producers
     if (isset($message['source'])) {
-      $this->mobileSubmission['source'] = $message['source'];
+      $this->mobileMessage['source'] = $message['source'];
     }
     if (isset($message['mobile'])) {
-      $this->mobileSubmission['mobile'] = $message['mobile'];
+      $this->mobileMessage['mobile'] = $message['mobile'];
+    }
+    elseif (isset($message['mobile_number'])) {
+      $this->mobileMessage['mobile'] = $message['mobile_number'];
+    }
+    elseif (isset($message['phone_number'])) {
+      $this->mobileMessage['mobile'] = $message['phone_number'];
+    }
+    if (isset($message['mc_opt_in_path_id'])) {
+      $this->mobileMessage['service_path_id'] = $message['mc_opt_in_path_id'];
     }
 
     // Optional user details
     if (isset($message['email'])) {
-      $this->mobileSubmission['email'] = $message['email'];
+      $this->mobileMessage['email'] = $message['email'];
     }
     if (isset($message['merge_vars']['FNAME'])) {
-      $this->mobileSubmission['first_name'] = $message['merge_vars']['FNAME'];
+      $this->mobileMessage['first_name'] = $message['merge_vars']['FNAME'];
     }
-    elseif ($payloadDetails['first_name']) {
-      $this->mobileSubmission['first_name'] = $payloadDetails['first_name'];
+    elseif (isset($message['first_name'])) {
+      $this->mobileMessage['first_name'] = $message['first_name'];
     }
     if (isset($message['merge_vars']['LNAME'])) {
-      $this->mobileSubmission['last_name'] = $message['merge_vars']['LNAME'];
+      $this->mobileMessage['last_name'] = $message['merge_vars']['LNAME'];
+    }
+    elseif (isset($message['last_name'])) {
+      $this->mobileMessage['last_name'] = $message['last_name'];
+    }
+    if (isset($message['birthdate']) && (is_int($message['birthdate']) || ctype_digit($message['birthdate']))) {
+      $this->mobileMessage['birthdate'] = date('Y-m-d', $message['birthdate']);
+    }
+    if (isset($message['birthdate_timestamp'])) {
+      $this->mobileMessage['birthdate'] = date('Y-m-d', $message['birthdate_timestamp']);
+    }
+    if (isset($payloadDetails['birthdate_timestamp'])) {
+      $this->mobileMessage['BirthYear'] = date('Y', $message['birthdate_timestamp']);
     }
 
     if (isset($message['address1'])) {
-      $this->mobileSubmission['address1'] = $message['address1'];
+      $this->mobileMessage['address1'] = $message['address1'];
     }
     if (isset($message['address2'])) {
-      $this->mobileSubmission['address2'] = $message['address2'];
+      $this->mobileMessage['address2'] = $message['address2'];
     }
     if (isset($message['city'])) {
-      $this->mobileSubmission['city'] = $message['city'];
+      $this->mobileMessage['city'] = $message['city'];
     }
     if (isset($message['state'])) {
-      $this->mobileSubmission['state'] = $message['state'];
+      $this->mobileMessage['state'] = $message['state'];
     }
     if (isset($message['country'])) {
-      $this->mobileSubmission['country'] = $message['country'];
+      $this->mobileMessage['country'] = $message['country'];
     }
     if (isset($message['zip'])) {
-      $this->mobileSubmission['postal_code'] = $message['zip'];
+      $this->mobileMessage['postal_code'] = $message['zip'];
     }
 
   }
   
   /**
    * Method to determine if message can / should be processed. Conditions based on business
-   * logic for member's mobile numbers.
+   * logic for submitted mobile numbers and related message values.
    *
    * @retun boolean
    */
   protected function canProcess() {
     
-    if (isset($this->mobileSubmission['application_id']) && $this->mobileSubmission['application_id'] != 'US' && $this->mobileSubmission['application_id'] == 'CA') {
-      echo '** Unsupported affiliate country: ' . $this->mobileSubmission['application_id'] . ', ' . $this->mobileSubmission['phone_number'] . ' not submitted to a mobile service.', PHP_EOL;
+    if (!isset($this->message['application_id'])) {
+      echo '** application_id not set: ' . print_r($this->mobileSubmission, TRUE), PHP_EOL;
+      return FALSE;
+    }
+
+    $supportedApps = ['US', 'CA', 'CGG', 'AGG'];
+    if (!in_array($this->message['application_id'], $supportedApps)) {
+      echo '** Unsupported application: ' . $this->mobileSubmission['application_id'] . ', ' .
+        $this->message['phone_number'] . ' was not submitted to a mobile service.', PHP_EOL;
       return FALSE;
     }
 
