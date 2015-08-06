@@ -108,7 +108,7 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
     $this->message['phone_number'] = $message['mobile'];
     unset($this->message['mobile']);
     if (isset($message['service_path_id'])) {
-      $this->message['mc_opt_in_path_id'] = $message['service_path_id'];
+      $this->message['opt_in_path_id'] = $message['service_path_id'];
       unset($this->message['service_path_id']);
     }
 
@@ -147,7 +147,7 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
         // $this->messageBroker->sendAck($payload);
         $this->statHat->ezCount('MBC_RegistrationMobile_Service_MobileCommons: profiles_update success');
       }
-      echo '-> MBC_RegistrationMobile_Service_MobileCommons->process: ' . $this->message['mobile'] . ' -------', PHP_EOL;
+      echo '-> MBC_RegistrationMobile_Service_MobileCommons->process: ' . $this->message['phone_number'] . ' -------', PHP_EOL;
     }
     catch (Exception $e) {
       trigger_error('mbc-registration-mobile ERROR - Failed to submit "profiles_update" to Mobile Commons API.', E_USER_WARNING);
@@ -178,6 +178,7 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
       'password' => $mobileCommonsConfig[$affiliate]['password'],
       'company_key' => $mobileCommonsConfig[$affiliate]['company_key'],
     );
+    echo 'connectServiceObject company_key: ' . $mobileCommonsConfig[$affiliate]['company_key'], PHP_EOL;
     $mobileServiceObject = new \MobileCommons($config);
 
     return $mobileServiceObject;
