@@ -28,11 +28,11 @@ class  MBC_RegistrationMobile_ServiceDirector
     $this->mbConfig = MB_Configuration::getInstance();
     $this->statHat = $this->mbConfig->getProperty('statHat');
     
-    $this->mobileService = $mobileServiceDirector->connectService($this->message);
+    $this->mobileService = $this->serviceFactory($message);
   }
   
   /**
-   * connectService: instantiate object for mobile service based on the
+   * serviceFactory: instantiate object for mobile service based on the
    * country code. Different service providers can be supported by instantiating an object specific to the message application. Currently only Mobile Commons is
    * supported.
    *
@@ -43,7 +43,7 @@ class  MBC_RegistrationMobile_ServiceDirector
    * @return object $mobileServiceObject
    *   An obect of a mobile service.
    */
-  public function connectService($message) {
+  public function serviceFactory($message) {
 
     switch ($message['application_id']) {
 
@@ -73,7 +73,7 @@ class  MBC_RegistrationMobile_ServiceDirector
    * @return object $mobileServiceObject
    *   An obect of a mobile service.
    */
-  public function gettService() {
+  public function getService() {
     return $this->mobileService;
   }
 
