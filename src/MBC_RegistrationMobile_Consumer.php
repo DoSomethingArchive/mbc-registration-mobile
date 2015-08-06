@@ -54,6 +54,7 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
       // ack maessage
     }
 
+    unset($this->mobileMessage);
     echo '- mbc-registration-mobile - MBC_RegistrationMobile_Consumer->consumeRegistrationMobileQueue() END', PHP_EOL;
   }
 
