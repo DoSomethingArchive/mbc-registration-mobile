@@ -7,61 +7,18 @@
  * entries in Mobile Commons based the contents of the queue.
  */
 
+date_default_timezone_set('America/New_York');
+define('CONFIG_PATH',  __DIR__ . '/messagebroker-config');
+
 // Load up the Composer autoload magic
 require_once __DIR__ . '/vendor/autoload.php';
-use DoSomething\MB_Toolbox\MB_Configuration;
+use DoSomething\MBC_RegistrationMobile\MBC_RegistrationMobile_Consumer;
 
-// Load configuration settings common to the Message Broker system
-// symlinks in the project directory point to the actual location of the files
-require_once __DIR__ . '/messagebroker-config/mb-secure-config.inc';
-require_once __DIR__ . '/MBC_RegistrationMobile.class.inc';
+// Load configuration settings specific to this application
+require_once __DIR__ . '/mbc-registration-mobile.config.inc';
 
-// Settings
-$credentials = array(
-  'host' =>  getenv("RABBITMQ_HOST"),
-  'port' => getenv("RABBITMQ_PORT"),
-  'username' => getenv("RABBITMQ_USERNAME"),
-  'password' => getenv("RABBITMQ_PASSWORD"),
-  'vhost' => getenv("RABBITMQ_VHOST"),
-);
-$settings = array(
-  'stathat_ez_key' => getenv("STATHAT_EZKEY"),
-);
-
-$config = array();
-$source = __DIR__ . '/messagebroker-config/mb_config.json';
-$mb_config = new MB_Configuration($source, $settings);
-$transactionalExchange = $mb_config->exchangeSettings('transactionalExchange');
-
-$config['exchange'] = array(
-  'name' => $transactionalExchange->name,
-  'type' => $transactionalExchange->type,
-  'passive' => $transactionalExchange->passive,
-  'durable' => $transactionalExchange->durable,
-  'auto_delete' => $transactionalExchange->auto_delete,
-);
-foreach ($transactionalExchange->queues->mobileCommonsQueue->binding_patterns as $bindingCount => $bindingKey) {
-  $config['queue'][$bindingCount] = array(
-    'name' => $transactionalExchange->queues->mobileCommonsQueue->name,
-    'passive' => $transactionalExchange->queues->mobileCommonsQueue->passive,
-    'durable' =>  $transactionalExchange->queues->mobileCommonsQueue->durable,
-    'exclusive' =>  $transactionalExchange->queues->mobileCommonsQueue->exclusive,
-    'auto_delete' =>  $transactionalExchange->queues->mobileCommonsQueue->auto_delete,
-    'bindingKey' => $bindingKey,
-  );
-}
-$config['consume'] = array(
-  'no_local' => $transactionalExchange->queues->mobileCommonsQueue->consume->no_local,
-  'no_ack' => $transactionalExchange->queues->mobileCommonsQueue->consume->no_ack,
-  'nowait' => $transactionalExchange->queues->mobileCommonsQueue->consume->nowait,
-  'exclusive' => $transactionalExchange->queues->mobileCommonsQueue->consume->exclusive,
-);
-
-
-echo '------- mbc-registration-mobile START: ' . date('D M j G:i:s T Y') . ' -------', "\n";
-
-// Kick off
-$mb = new MessageBroker($credentials, $config);
-$mb->consumeMessage(array(new MBC_RegistrationMobile($mb, $settings), 'consumeRegistrationMobileQueue'));
-
-echo '------- mbc-registration-mobile END: ' . date('D M j G:i:s T Y') . ' -------', "\n";
+// Kick off - block, wait for messages in queue
+echo '------- mbc-registration-mobile START - ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
+$mb = $mbConfig->getProperty('messageBroker');
+$mb->consumeMessage(array(new MBC_RegistrationMobile_Consumer(), 'consumeRegistrationMobileQueue'));
+echo '------- mbc-registration-mobile END - ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
