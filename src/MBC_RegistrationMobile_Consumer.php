@@ -5,7 +5,7 @@ use DoSomething\StatHat\Client as StatHat;
 use DoSomething\MB_Toolbox\MB_Toolbox;
 use DoSomething\MB_Toolbox\MB_Toolbox_BaseConsumer;
 
-/*
+/**
  * MBC_RegistrationMobileConsumer.class.in: Used to process the mobileCommonsQueue
  * entries that match the campaign.signup.* and user.registration.* bindings. Support
  * for different mobile services by affiliate is based on message application_id
