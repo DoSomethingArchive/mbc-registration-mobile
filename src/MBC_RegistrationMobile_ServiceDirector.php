@@ -45,6 +45,8 @@ class  MBC_RegistrationMobile_ServiceDirector
    */
   public function serviceFactory($message) {
 
+    echo '- MBC_RegistrationMobile_ServiceDirector->serviceFactory() application_id: ' . $message['application_id'], PHP_EOL;
+
     switch ($message['application_id']) {
 
       case 'US':
