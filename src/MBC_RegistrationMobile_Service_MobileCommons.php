@@ -86,11 +86,13 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
 
     // Mobile Commons, current supplier for US and CA requirements
     if (!isset($message['mobile'])) {
-      echo '** canProcess(): Mobile Commons requires a mobile number for processing.', PHP_EOL;
+      echo '** canProcess(): $message[mobile] not set. Mobile Commons requires a mobile number for processing.', PHP_EOL;
+      echo '- MBC_RegistrationMobile_Service_MobileCommons->canProcess: message: ' . print_r($message, TRUE), PHP_EOL . PHP_EOL;
       return FALSE;
     }
     if (!isset($message['service_path_id'])) {
-      echo '** canProcess(): Mobile Commons requires service_path_id (opt in) for processing.', PHP_EOL;
+      echo '** canProcess(): $message[service_path_id] not set. Mobile Commons requires service_path_id (opt in) for processing.', PHP_EOL;
+      echo '- MBC_RegistrationMobile_Service_MobileCommons->canProcess: message: ' . print_r($message, TRUE), PHP_EOL . PHP_EOL;
       return FALSE;
     }
 
