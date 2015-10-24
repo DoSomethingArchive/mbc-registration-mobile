@@ -28,7 +28,7 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
    */
   public function consumeRegistrationMobileQueue($payload) {
 
-    echo '- mbc-registration-mobile - MBC_RegistrationMobile_Consumer->consumeRegistrationMobileQueue() START', PHP_EOL;
+    echo '------ mbc-registration-mobile - MBC_RegistrationMobile_Consumer->consumeRegistrationMobileQueue() START ------', PHP_EOL . PHP_EOL;
 
     parent::consumeQueue($payload);
     $this->setter($this->message);
@@ -45,6 +45,9 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
         // Log processing of mobile user
         // $ip->log();
       }
+      else {
+        $this->messageBroker->sendAck($this->message['payload']);
+      }
 
       // Destructor
       unset($mobileService);
@@ -55,7 +58,7 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
     }
 
     unset($this->mobileMessage);
-    echo '- mbc-registration-mobile - MBC_RegistrationMobile_Consumer->consumeRegistrationMobileQueue() END', PHP_EOL;
+    echo  PHP_EOL . '------ mbc-registration-mobile - MBC_RegistrationMobile_Consumer->consumeRegistrationMobileQueue() END ------', PHP_EOL . PHP_EOL;
   }
 
   /**
@@ -147,7 +150,7 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
   protected function canProcess() {
     
     if (!isset($this->message['application_id'])) {
-      echo '** application_id not set: ' . print_r($this->mobileSubmission, TRUE), PHP_EOL;
+      echo '** application_id not set: ' . print_r($this->message, TRUE), PHP_EOL;
       return FALSE;
     }
 
