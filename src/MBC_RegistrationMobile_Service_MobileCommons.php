@@ -87,12 +87,18 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
     // Mobile Commons, current supplier for US and CA requirements
     if (!isset($message['mobile'])) {
       echo '** canProcess(): $message[mobile] not set. Mobile Commons requires a mobile number for processing.', PHP_EOL;
-      echo '- MBC_RegistrationMobile_Service_MobileCommons->canProcess: message: ' . print_r($message, TRUE), PHP_EOL . PHP_EOL;
+      // Remove objects from error report output
+      unset($message['original']);
+      unset($message['payload']);
+      echo '*** MBC_RegistrationMobile_Service_MobileCommons->canProcess: message: ' . print_r($message, TRUE), PHP_EOL . PHP_EOL;
       return FALSE;
     }
     if (!isset($message['service_path_id'])) {
-      echo '** canProcess(): $message[service_path_id] not set. Mobile Commons requires service_path_id (opt in) for processing.', PHP_EOL;
-      echo '- MBC_RegistrationMobile_Service_MobileCommons->canProcess: message: ' . print_r($message, TRUE), PHP_EOL . PHP_EOL;
+      echo '** canProcess(): $message[service_path_id] not set for mobile: ' . $message['mobile'] . '. Mobile Commons requires service_path_id (opt in) for processing.', PHP_EOL;
+      // Remove objects from error report output
+      unset($message['original']);
+      unset($message['payload']);
+      echo '*** MBC_RegistrationMobile_Service_MobileCommons->canProcess: message: ' . print_r($message, TRUE), PHP_EOL . PHP_EOL;
       return FALSE;
     }
 
@@ -141,14 +147,14 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
       if (isset($status['error'])) {
         echo '- Error - ' . $status['error']->attributes()->{'message'} , PHP_EOL;
         echo '  Submitted: ' . print_r($this->message, TRUE), PHP_EOL;
+        // throw new Exception('');
         $this->statHat->ezCount('MBC_RegistrationMobile_Service_MobileCommons: profiles_update error: ' . $status['error']->attributes()->{'message'});
       }
       else {
-
-        // todo: adjust exchange / queue settings to require ack
-        // $this->messageBroker->sendAck($payload);
+        $this->messageBroker->sendAck($payload);
         $this->statHat->ezCount('MBC_RegistrationMobile_Service_MobileCommons: profiles_update success');
       }
+
       echo '-> MBC_RegistrationMobile_Service_MobileCommons->process: ' . $this->message['phone_number'] . ' -------', PHP_EOL;
     }
     catch (Exception $e) {
