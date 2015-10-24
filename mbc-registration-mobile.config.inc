@@ -6,6 +6,7 @@
 use DoSomething\MB_Toolbox\MB_Configuration;
 use DoSomething\StatHat\Client as StatHat;
 use DoSomething\MB_Toolbox\MB_Toolbox;
+use DoSomething\MB_Toolbox\MB_RabbitMQManagementAPI;
 
 // Load configuration settings common to the Message Broker system
 // symlinks in the project directory point to the actual location of the files
@@ -21,6 +22,12 @@ $mbConfig->setProperty('rabbit_credentials', array(
   'password' => getenv("RABBITMQ_PASSWORD"),
   'vhost' => getenv("RABBITMQ_VHOST"),
 ));
+$mbConfig->setProperty('rabbitapi_credentials', [
+  'host' =>  getenv("MB_RABBITMQ_MANAGEMENT_API_HOST"),
+  'port' => getenv("MB_RABBITMQ_MANAGEMENT_API_PORT"),
+  'username' => getenv("MB_RABBITMQ_MANAGEMENT_API_USERNAME"),
+  'password' => getenv("MB_RABBITMQ_MANAGEMENT_API_PASSWORD"),
+]);
 $mbRabbitConfig = $mbConfig->constructRabbitConfig('transactionalExchange', array('mobileCommonsQueue'));
 $mbConfig->setProperty('rabbit_config', $mbRabbitConfig);
 
@@ -59,3 +66,10 @@ $mbConfig->setProperty('statHat', new StatHat([
 ]));
 
 $mbConfig->setProperty('mbToolbox', new MB_Toolbox());
+$mbConfig->setProperty('mbRabbitMQManagementAPI', new MB_RabbitMQManagementAPI([
+  'domain' => getenv("MB_RABBITMQ_MANAGEMENT_API_HOST"),
+  'port' => getenv('MB_RABBITMQ_MANAGEMENT_API_PORT'),
+  'vhost' => getenv('MB_RABBITMQ_MANAGEMENT_API_VHOST'),
+  'username' => getenv('MB_RABBITMQ_MANAGEMENT_API_USERNAME'),
+  'password' => getenv('MB_RABBITMQ_MANAGEMENT_API_PASSWORD')
+]));
