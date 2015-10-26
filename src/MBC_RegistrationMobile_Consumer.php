@@ -54,7 +54,7 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
       
     }
     else {
-      // ack maessage
+      $this->messageBroker->sendAck($this->message['payload']);
     }
 
     unset($this->mobileMessage);
@@ -74,6 +74,15 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
 
     if (isset($message['application_id'])) {
       $this->mobileMessage['application_id'] = $message['application_id'];
+    }
+
+    // @todo: application_id needs to be defined in mbc-user-import
+    // https://github.com/DoSomething/mbc-user-import/issues/44
+    if (!(isset($message['application_id'])) &&
+        ($this->message['source'] == 'niche' || $this->message['source'] == 'att-ichannel' || $this->message['source'] == 'hercampus' || $this->message['source'] == 'teenlife')) {
+      echo '** application_id not set BUT source is from mbc-user-import. Setting application_id to MUI, should be addressed future fix in  mbc-user-import.', PHP_EOL;
+      $this->message['application_id'] = 'MUI';
+      $this->mobileMessage['application_id'] = 'MUI';
     }
 
     // Set by origin of where user data was collected - typically Message
@@ -148,16 +157,26 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
    * @retun boolean
    */
   protected function canProcess() {
-    
+
+    // Cleanup message for error reporting
+    // @todo: Create common method in MB_Toolbox
+    $errorMessage = $this->message;
+    unset($errorMessage['original']);
+    unset($errorMessage['payload']);
+
     if (!isset($this->message['application_id'])) {
-      echo '** application_id not set: ' . print_r($this->message, TRUE), PHP_EOL;
+      echo '** application_id not set: ' . print_r($errorMessage, TRUE), PHP_EOL;
       return FALSE;
     }
 
-    $supportedApps = ['US', 'CA', 'CGG', 'AGG'];
+    $supportedApps = ['US', 'CA', 'CGG', 'AGG', 'MUI'];
     if (!in_array($this->message['application_id'], $supportedApps)) {
-      echo '** Unsupported application: ' . $this->mobileSubmission['application_id'] . ', ' .
-        $this->message['phone_number'] . ' was not submitted to a mobile service.', PHP_EOL;
+      echo '** Unsupported application: ' . $this->message['application_id'], PHP_EOL;
+      return FALSE;
+    }
+
+    if (!isset($this->message['mobile'])) {
+      echo '** mobile number was not submitted: ' . print_r($errorMessage, TRUE), PHP_EOL;
       return FALSE;
     }
 
