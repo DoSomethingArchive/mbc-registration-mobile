@@ -8,6 +8,7 @@ namespace DoSomething\MBC_RegistrationMobile;
 use DoSomething\StatHat\Client as StatHat;
 use DoSomething\MB_Toolbox\MB_Toolbox;
 use DoSomething\MB_Toolbox\MB_Configuration;
+use \Exception;
 
 /*
  * MBC_RegistrationMobile_Service_MobileCommons: Used to process the mobileCommonsQueue
