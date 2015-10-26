@@ -61,6 +61,11 @@ class  MBC_RegistrationMobile_ServiceDirector
 
         break;
 
+      case 'MUI':
+        $mobileService = new MBC_RegistrationMobile_Service_MobileCommons($message);
+
+        break;
+
       default:
         $mobileService = NULL;
 
