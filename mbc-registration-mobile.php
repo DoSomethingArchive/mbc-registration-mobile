@@ -9,6 +9,10 @@
 
 date_default_timezone_set('America/New_York');
 define('CONFIG_PATH',  __DIR__ . '/messagebroker-config');
+// The number of messages for the consumer to reserve with each callback
+// See consumeMwessage for further details.
+// Necessary for parallel processing when more than one consumer is running on the same queue.
+define('QOS_SIZE', 1);
 
 // Load up the Composer autoload magic
 require_once __DIR__ . '/vendor/autoload.php';
@@ -20,5 +24,5 @@ require_once __DIR__ . '/mbc-registration-mobile.config.inc';
 // Kick off - block, wait for messages in queue
 echo '------- mbc-registration-mobile START - ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
 $mb = $mbConfig->getProperty('messageBroker');
-$mb->consumeMessage(array(new MBC_RegistrationMobile_Consumer(), 'consumeRegistrationMobileQueue'));
+$mb->consumeMessage(array(new MBC_RegistrationMobile_Consumer(), 'consumeRegistrationMobileQueue'), QOS_SIZE);
 echo '------- mbc-registration-mobile END - ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
