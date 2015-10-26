@@ -37,6 +37,11 @@ $mbConfig->setProperty('mobileCommons_config', array(
     'password' => getenv("MOBILE_COMMONS_US_PASSWORD"),
     'company_key' => getenv("MOBILE_COMMONS_US_COMPANY_KEY"),
   ),
+  'MUI' => array(
+    'username' => getenv("MOBILE_COMMONS_US_USER"),
+    'password' => getenv("MOBILE_COMMONS_US_PASSWORD"),
+    'company_key' => getenv("MOBILE_COMMONS_US_COMPANY_KEY"),
+  ),
   'CGG' => array(
     'username' => getenv("MOBILE_COMMONS_US_USER"),
     'password' => getenv("MOBILE_COMMONS_US_PASSWORD"),
