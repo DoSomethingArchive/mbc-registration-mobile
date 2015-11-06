@@ -49,18 +49,34 @@ class  MBC_RegistrationMobile_ServiceDirector
 
     switch ($message['application_id']) {
 
+      // Affiliates sites
       case 'US':
       case 'CA':
         $mobileService = new MBC_RegistrationMobile_Service_MobileCommons($message);
 
         break;
       
+      // Voting App
       case 'CGG':
       case 'AGG':
-        $mobileService = new MBC_RegistrationMobile_Service_MobileCommons($message);
+
+        // Support different SMS services by user country
+        switch ($message['user_country']) {
+
+          case 'MX':
+          case 'BR':
+            $mobileService = new MBC_RegistrationMobile_Service_mGage($message);
+
+            break;
+
+          default:
+            $mobileService = new MBC_RegistrationMobile_Service_MobileCommons($message);
+
+        }
 
         break;
 
+      // User Import
       case 'MUI':
         $mobileService = new MBC_RegistrationMobile_Service_MobileCommons($message);
 
