@@ -148,6 +148,7 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
       if (isset($status['error'])) {
         echo '- Error - ' . $status['error']->attributes()->{'message'} , PHP_EOL;
         echo '  Submitted: ' . print_r($this->message, TRUE), PHP_EOL;
+        $this->messageBroker->sendNack($payload);
         // throw new Exception('');
         $this->statHat->ezCount('MBC_RegistrationMobile_Service_MobileCommons: profiles_update error: ' . $status['error']->attributes()->{'message'});
       }
