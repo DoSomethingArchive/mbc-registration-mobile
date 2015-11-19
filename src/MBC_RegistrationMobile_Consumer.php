@@ -75,6 +75,9 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
     if (isset($message['application_id'])) {
       $this->mobileMessage['application_id'] = $message['application_id'];
     }
+    if (isset($message['user_country'])) {
+      $this->mobileMessage['user_country'] = $message['user_country'];
+    }
 
     // @todo: application_id needs to be defined in mbc-user-import
     // https://github.com/DoSomething/mbc-user-import/issues/44
@@ -101,6 +104,9 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
     }
     if (isset($message['mc_opt_in_path_id'])) {
       $this->mobileMessage['service_path_id'] = $message['mc_opt_in_path_id'];
+    }
+    elseif (isset($message['mobile_opt_in_path_id'])) {
+      $this->mobileMessage['service_path_id'] = $message['mobile_opt_in_path_id'];
     }
 
     // Optional user details
