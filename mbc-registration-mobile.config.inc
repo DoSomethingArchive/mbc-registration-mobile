@@ -58,9 +58,10 @@ $mbConfig->setProperty('mobileCommons_config', array(
     'company_key' => getenv("MOBILE_COMMONS_CA_COMPANY_KEY"),
   )
 ));
+
 $mobileConfig = $mbConfig->gatherSettings('mobile');
 $mbConfig->setProperty('communicatePro_config', array(
-  'settings' => $mobileConfig['mGage'],
+  'settings' => $mobileConfig->mGage,
   'username' => getenv("COMMUNICATE_PRO_USER"),
   'password' => getenv("COMMUNICATE_PRO_PASSWORD")
 ));
