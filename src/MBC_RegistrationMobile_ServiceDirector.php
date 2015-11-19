@@ -60,6 +60,8 @@ class  MBC_RegistrationMobile_ServiceDirector
       case 'CGG':
       case 'AGG':
 
+        echo '- MBC_RegistrationMobile_ServiceDirector->serviceFactory() user_country: ' . $message['user_country'], PHP_EOL;
+
         // Support different SMS services by user country
         switch ($message['user_country']) {
 
