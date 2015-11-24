@@ -97,7 +97,7 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
       echo '** canProcess(): Unsupported user_country: ' . $this->message['user_country'], PHP_EOL;
       return FALSE;
     }
-    else {
+    elseif (!(isset($this->message['user_country']))) {
       echo '** WARNING: user_country not set.', PHP_EOL;
     }
 
