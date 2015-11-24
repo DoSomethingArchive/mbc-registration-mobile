@@ -2,8 +2,8 @@
 namespace DoSomething\MBC_RegistrationMobile;
 
 use DoSomething\StatHat\Client as StatHat;
-use DoSomething\MB_Toolbox\MB_Toolbox;
 use DoSomething\MB_Toolbox\MB_Toolbox_BaseConsumer;
+use \Exception;
 
 /**
  * MBC_RegistrationMobileConsumer.class.in: Used to process the mobileCommonsQueue
@@ -15,7 +15,7 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
 {
 
   /**
-   * Values submitted in potential mobile activity message.
+   *
    */
   protected $mobileMessage;
 
@@ -28,37 +28,86 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
    */
   public function consumeRegistrationMobileQueue($payload) {
 
-    echo '------ mbc-registration-mobile - MBC_RegistrationMobile_Consumer->consumeRegistrationMobileQueue() START ------', PHP_EOL . PHP_EOL;
+    echo '------ mbc-registration-mobile - MBC_RegistrationMobile_Consumer->consumeRegistrationMobileQueue() - ' . date('j D M Y G:i:s T') . ' START ------', PHP_EOL . PHP_EOL;
 
     parent::consumeQueue($payload);
-    $this->setter($this->message);
-    
-    if (self::canProcess($this->mobileMessage)) {
-      
-      $mobileServiceDirector = new MBC_RegistrationMobile_ServiceDirector($this->mobileMessage);
-      $mobileService = $mobileServiceDirector->getService();
-      
-      if ($mobileService->canProcess($this->mobileMessage)) {
-        $mobileService->setter($this->mobileMessage);
-        $mobileService->process();
-        
-        // Log processing of mobile user
-        // $ip->log();
-      }
-      else {
-        $this->messageBroker->sendAck($this->message['payload']);
-      }
 
-      // Destructor
-      unset($mobileService);
-      
+    if (isset($this->message['mobile'])) {
+      echo '** Consuming: ' . $this->message['mobile'];
+      if (isset($this->message['user_country'])) {
+        echo ' from: ' .  $this->message['user_country'], PHP_EOL;
+      } else {
+        echo ', user_country not defined.', PHP_EOL;
+      }
     }
     else {
+      echo 'xx Skipping, mobile not defined.', PHP_EOL;
+    }
+
+    if ($this->canProcess()) {
+
+      try {
+
+        $this->setter($this->message);
+        $this->process();
+        $this->messageBroker->sendAck($this->message['payload']);
+      }
+      catch(Exception $e) {
+        echo 'Error sending mobile number: ' . $this->message['mobile'] . ' to mobile service for user signup. Error: ' . $e->getMessage();
+      }
+
+    }
+    else {
+      echo '- ' . $this->message['mobile'] . ' failed canProcess(), removing from queue.', PHP_EOL;
       $this->messageBroker->sendAck($this->message['payload']);
     }
 
-    unset($this->mobileMessage);
-    echo  PHP_EOL . '------ mbc-registration-mobile - MBC_RegistrationMobile_Consumer->consumeRegistrationMobileQueue() END ------', PHP_EOL . PHP_EOL;
+    // @todo: Throttle the number of consumers running. Based on the number of messages
+    // waiting to be processed start / stop consumers. Make "reactive"!
+    $queueMessages = parent::queueStatus('transactionalQueue');
+    echo '- queueMessages ready: ' . $queueMessages['ready'], PHP_EOL;
+    echo '- queueMessages unacked: ' . $queueMessages['unacked'], PHP_EOL;
+
+    echo  PHP_EOL . '------ mbc-registration-mobile - MBC_RegistrationMobile_Consumer->consumeRegistrationMobileQueue() - ' . date('j D M Y G:i:s T') . ' END ------', PHP_EOL . PHP_EOL;
+  }
+
+  /**
+   * Method to determine if message can / should be processed. Conditions based on business
+   * logic for submitted mobile numbers and related message values.
+   *
+   * @retun boolean
+   */
+  protected function canProcess() {
+
+    if (!isset($this->message['application_id'])) {
+      echo '** canProcess(): application_id not set.', PHP_EOL;
+      parent::reportErrorPayload();
+      return FALSE;
+    }
+
+    $supportedApps = ['US', 'CA', 'CGG', 'AGG', 'MUI'];
+    if (!in_array($this->message['application_id'], $supportedApps)) {
+      echo '** canProcess(): Unsupported application: ' . $this->message['application_id'], PHP_EOL;
+      parent::reportErrorPayload();
+      return FALSE;
+    }
+
+    $supportedCountries = ['US', 'CA', 'MX', 'BR'];
+    if (isset($this->message['user_country']) && !in_array($this->message['user_country'], $supportedCountries)) {
+      echo '** canProcess(): Unsupported user_country: ' . $this->message['user_country'], PHP_EOL;
+      return FALSE;
+    }
+    else {
+      echo '** WARNING: user_country not set.', PHP_EOL;
+    }
+
+    if (!isset($this->message['mobile'])) {
+      echo '** canProcess(): mobile number was not submitted.', PHP_EOL;
+      parent::reportErrorPayload();
+      return FALSE;
+    }
+
+    return TRUE;
   }
 
   /**
@@ -80,6 +129,7 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
     }
 
     // @todo: application_id needs to be defined in mbc-user-import
+    // MUI - Machine User Import
     // https://github.com/DoSomething/mbc-user-import/issues/44
     if (!(isset($message['application_id'])) &&
         ($this->message['source'] == 'niche' || $this->message['source'] == 'att-ichannel' || $this->message['source'] == 'hercampus' || $this->message['source'] == 'teenlife')) {
@@ -155,47 +205,6 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
     }
 
   }
-  
-  /**
-   * Method to determine if message can / should be processed. Conditions based on business
-   * logic for submitted mobile numbers and related message values.
-   *
-   * @retun boolean
-   */
-  protected function canProcess() {
-
-    // Cleanup message for error reporting
-    // @todo: Create common method in MB_Toolbox
-    $errorMessage = $this->message;
-    unset($errorMessage['original']);
-    unset($errorMessage['payload']);
-
-    if (!isset($this->message['application_id'])) {
-      echo '** application_id not set: ' . print_r($errorMessage, TRUE), PHP_EOL;
-      return FALSE;
-    }
-
-    $supportedApps = ['US', 'CA', 'CGG', 'AGG', 'MUI'];
-    if (!in_array($this->message['application_id'], $supportedApps)) {
-      echo '** Unsupported application: ' . $this->message['application_id'], PHP_EOL;
-      return FALSE;
-    }
-
-    if (!isset($this->message['mobile'])) {
-      echo '** mobile number was not submitted: ' . print_r($errorMessage, TRUE), PHP_EOL;
-      return FALSE;
-    }
-
-    // Validate phone number based on the North American Numbering Plan
-    // https://en.wikipedia.org/wiki/North_American_Numbering_Plan
-    $regex = "/^(\d[\s-]?)?[\(\[\s-]{0,2}?\d{3}[\)\]\s-]{0,2}?\d{3}[\s-]?\d{4}$/i";
-    if (!(preg_match($regex, $this->message['mobile']))) {
-      echo '- Invalid phone number based on  North American Numbering Plan standard: ' .  $this->message['mobile'], PHP_EOL;
-      return FALSE;
-    }
-
-    return TRUE;
-  }
 
   /**
    * Method to process image.
@@ -204,6 +213,25 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
    *   The contents of the queue entry
    */
   protected function process() {
+
+    $mobileServiceDirector = new MBC_RegistrationMobile_ServiceDirector($this->mobileMessage);
+    $mobileService = $mobileServiceDirector->getService();
+
+    if ($mobileService->canProcess($this->mobileMessage)) {
+
+      try {
+        $mobileService->setter($this->mobileMessage);
+        $mobileService->process();
+      }
+      catch(Exception $e) {
+        echo 'Error sending mobile number: ' . $this->message['mobile'] . ' to mobile service for user signup. Error: ' . $e->getMessage();
+
+        // Trow Exception to fall back to next try/catch
+
+      }
+
+    }
+
   }
 
 }
