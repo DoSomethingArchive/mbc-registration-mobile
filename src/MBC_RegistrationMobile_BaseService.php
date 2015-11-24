@@ -10,6 +10,7 @@ use DoSomething\StatHat\Client as StatHat;
 use DoSomething\MB_Toolbox\MB_Toolbox;
 use DoSomething\MB_Toolbox\MB_Configuration;
 
+
 /*
  * MBC_UserAPICampaignActivity.class.in: Used to process the transactionalQueue
  * entries that match the campaign.*.* binding.
@@ -67,6 +68,17 @@ abstract class MBC_RegistrationMobile_BaseService
     $this->toolbox = $this->mbConfig->getProperty('mbToolbox');
 
     $this->message = $message;
+  }
+
+  /**
+   * Log payload with RabbitMQ objects removed for clarity.
+   */
+  public function reportErrorPayload() {
+
+    $errorPayload = $this->message;
+    unset($errorPayload['payload']);
+    unset($errorPayload['original']);
+    echo '-> message: ' . print_r($errorPayload, TRUE), PHP_EOL;
   }
 
   /**
