@@ -50,6 +50,8 @@ class  MBC_RegistrationMobile_ServiceDirector
     switch ($message['application_id']) {
 
       // Affiliates sites
+      // @todo: Move to single Drupal app to host all affiliate sites, add support for user_country to define which
+      // mobile service to use.
       case 'US':
       case 'CA':
         $mobileService = new MBC_RegistrationMobile_Service_MobileCommons($message);
@@ -72,13 +74,14 @@ class  MBC_RegistrationMobile_ServiceDirector
             break;
 
           default:
+            // Mobile numbers are not collected from users outside of US, CA, MX or BR. Default to Mobile Commons
             $mobileService = new MBC_RegistrationMobile_Service_MobileCommons($message);
 
         }
 
         break;
 
-      // User Import
+      // User Import - all US based users.
       case 'MUI':
         $mobileService = new MBC_RegistrationMobile_Service_MobileCommons($message);
 
