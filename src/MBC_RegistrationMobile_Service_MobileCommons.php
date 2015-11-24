@@ -87,19 +87,13 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
 
     // Mobile Commons, current supplier for US and CA requirements
     if (!isset($message['mobile'])) {
-      echo '** canProcess(): $message[mobile] not set. Mobile Commons requires a mobile number for processing.', PHP_EOL;
-      // Remove objects from error report output
-      unset($message['original']);
-      unset($message['payload']);
-      echo '*** MBC_RegistrationMobile_Service_MobileCommons->canProcess: message: ' . print_r($message, TRUE), PHP_EOL . PHP_EOL;
+      echo '** canProcess(): mobile not set. Mobile Commons requires a mobile number for processing.', PHP_EOL;
+      parent::reportErrorPayload();
       return FALSE;
     }
     if (!isset($message['service_path_id'])) {
       echo '** canProcess(): $message[service_path_id] not set for mobile: ' . $message['mobile'] . '. Mobile Commons requires service_path_id (opt in) for processing.', PHP_EOL;
-      // Remove objects from error report output
-      unset($message['original']);
-      unset($message['payload']);
-      echo '*** MBC_RegistrationMobile_Service_MobileCommons->canProcess: message: ' . print_r($message, TRUE), PHP_EOL . PHP_EOL;
+      parent::reportErrorPayload();
       return FALSE;
     }
 
@@ -121,14 +115,9 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
       unset($this->message['service_path_id']);
     }
 
-    if (strtoupper($message['application_id']) == 'CGG2014' && isset($message['original']['candidate_name'])) {
-      $this->message['CGG2014_1st_vote'] = $message['original']['candidate_name'];
-    }
-    // AGG2015
-    if (strtoupper($message['application_id']) == 'AGG' && isset($message['original']['candidate_name'])) {
-      $this->message['AGG2015_1st_vote'] = $message['original']['candidate_name'];
-      $this->message['AGG2015_1st_vote_id'] = $message['original']['candidate_id'];
-      $this->message['AGG2015_1st_vote_gender'] = $message['original']['candidate_gender'];
+    // CGG
+    if (strtoupper($message['application_id']) == 'CGG' && isset($message['original']['candidate_name'])) {
+      $this->message['CGG2015_1st_vote'] = $message['original']['candidate_name'];
     }
 
   }
@@ -176,7 +165,7 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
    *   that needs to be connected to.
    *
    * @return object $mobileServiceObject
-   *   An obect of a mobile service.
+   *   An object of a mobile service.
    */
   public function connectServiceObject($affiliate) {
 
