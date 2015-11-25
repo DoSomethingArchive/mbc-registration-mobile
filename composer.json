@@ -1,7 +1,7 @@
 {
   "name": "mbc-registration-mobile",
   "type": "project",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "A consumer application for the Message Broker system that consumes entries on the mobileCommonsQueue. Entries will produce new or update user accounts in Mobile Commons. Support for various affiliates will result in interfacing with the appropreate affiliate service / account.",
   "keywords": ["message broker", "Drupal", "SMS"],
   "homepage": "https://github.com/DoSomething/mbc-registration-mobile",
