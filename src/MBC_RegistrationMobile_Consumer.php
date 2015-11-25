@@ -125,16 +125,6 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
       $this->mobileMessage['user_country'] = $message['user_country'];
     }
 
-    // @todo: application_id needs to be defined in mbc-user-import
-    // MUI - Machine User Import
-    // https://github.com/DoSomething/mbc-user-import/issues/44
-    if (!(isset($message['application_id'])) &&
-        ($this->message['source'] == 'niche' || $this->message['source'] == 'att-ichannel' || $this->message['source'] == 'hercampus' || $this->message['source'] == 'teenlife')) {
-      echo '** application_id not set BUT source is from mbc-user-import. Setting application_id to MUI, should be addressed future fix in  mbc-user-import.', PHP_EOL;
-      $this->message['application_id'] = 'MUI';
-      $this->mobileMessage['application_id'] = 'MUI';
-    }
-
     // Set by origin of where user data was collected - typically Message
     // Broker user import but could also be external producers
     if (isset($message['source'])) {
