@@ -31,17 +31,13 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
     echo '------ mbc-registration-mobile - MBC_RegistrationMobile_Consumer->consumeRegistrationMobileQueue() - ' . date('j D M Y G:i:s T') . ' START ------', PHP_EOL . PHP_EOL;
 
     parent::consumeQueue($payload);
-
     if (isset($this->message['mobile'])) {
       echo '** Consuming: ' . $this->message['mobile'];
       if (isset($this->message['user_country'])) {
-        echo ' from: ' .  $this->message['user_country'], PHP_EOL;
+        echo ' from: ' .  $this->message['user_country'] . ' doing: ' . $this->message['activity'], PHP_EOL;
       } else {
         echo ', user_country not defined.', PHP_EOL;
       }
-    }
-    else {
-      echo 'xx Skipping, mobile not defined.', PHP_EOL;
     }
 
     if ($this->canProcess()) {
@@ -50,7 +46,8 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
 
         $this->setter($this->message);
         $this->process();
-        $this->messageBroker->sendAck($this->message['payload']);
+
+        // Ack in Service process() due to nested try/catch
       }
       catch(Exception $e) {
         echo 'Error sending mobile number: ' . $this->message['mobile'] . ' to mobile service for user signup. Error: ' . $e->getMessage();
@@ -58,7 +55,7 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
 
     }
     else {
-      echo '- ' . $this->message['mobile'] . ' failed canProcess(), removing from queue.', PHP_EOL;
+      echo '- failed canProcess(), removing from queue.', PHP_EOL;
       $this->messageBroker->sendAck($this->message['payload']);
     }
 
@@ -102,7 +99,7 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
     }
 
     if (!isset($this->message['mobile'])) {
-      echo '** canProcess(): mobile number was not submitted.', PHP_EOL;
+      echo '** canProcess(): mobile number was not defined.', PHP_EOL;
       parent::reportErrorPayload();
       return FALSE;
     }
@@ -231,7 +228,13 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
       }
 
     }
+    else {
+      echo 'Service canProcess() failed, removing from queue.', PHP_EOL;
+      $this->messageBroker->sendAck($this->mobileMessage['payload']);
+    }
 
+    // Cleanup for next message
+    unset($this->mobileMessage);
   }
 
 }
