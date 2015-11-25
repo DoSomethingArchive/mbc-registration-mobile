@@ -67,13 +67,13 @@ class  MBC_RegistrationMobile_Service_mGage extends MBC_RegistrationMobile_BaseS
    */
   public function __construct($message) {
 
+    $this->message = $message;
     $this->mbConfig = MB_Configuration::getInstance();
     $this->messageBroker = $this->mbConfig->getProperty('messageBroker');
     $this->statHat = $this->mbConfig->getProperty('statHat');
     $this->toolbox = $this->mbConfig->getProperty('mbToolbox');
 
     $this->mobileServiceObject = $this->connectServiceObject($message['user_country']);
-    $this->message = $message;
   }
 
   /**
@@ -109,27 +109,16 @@ class  MBC_RegistrationMobile_Service_mGage extends MBC_RegistrationMobile_BaseS
    */
   public function setter($message) {
 
-    $this->message['phone_number'] = $message['mobile'];
-    unset($this->message['mobile']);
+    $this->message['mobile'] = $message['mobile'];
     if (isset($message['service_path_id'])) {
       $this->message['opt_in_path_id'] = $message['service_path_id'];
       unset($this->message['service_path_id']);
-    }
-
-    // CCG2014
-    if (strtoupper($message['application_id']) == 'CGG2014' && isset($message['original']['candidate_name'])) {
-      $this->message['CGG2014_1st_vote'] = $message['original']['candidate_name'];
-    }
-    // CCG2015
-    if (strtoupper($message['application_id']) == 'CGG' && isset($message['original']['candidate_name'])) {
-      $this->message['CGG2015_1st_vote'] = $message['original']['candidate_name'];
     }
 
     // AGG2015
     if (strtoupper($message['application_id']) == 'AGG' && isset($message['original']['candidate_name'])) {
       $this->message['AGG2015_1st_vote'] = $message['original']['candidate_name'];
       $this->message['AGG2015_1st_vote_id'] = $message['original']['candidate_id'];
-      $this->message['AGG2015_1st_vote_gender'] = $message['original']['candidate_gender'];
     }
 
   }
@@ -143,7 +132,7 @@ class  MBC_RegistrationMobile_Service_mGage extends MBC_RegistrationMobile_BaseS
 
     try {
 
-      $status = (array)$this->mobileServiceObject->optIn($this->message);
+      $status = (array)$this->mobileServiceObject->mobileOriginated($this->message);
       if (isset($status['error'])) {
         echo '- Error - ' . $status['error']->attributes()->{'message'} , PHP_EOL;
         echo '  Submitted: ' . print_r($this->message, TRUE), PHP_EOL;
@@ -181,10 +170,10 @@ class  MBC_RegistrationMobile_Service_mGage extends MBC_RegistrationMobile_BaseS
     $config = array(
       'username' => $communicateProConfig['username'],
       'password' => $communicateProConfig['password'],
-      'optInID' => $communicateProConfig['optInID'][$userCountry],
+      'optInID' => $this->message['service_path_id'],
     );
-    echo '- connectServiceObject Communicate Pro: ' . $userCountry, PHP_EOL;
-    $mobileServiceObject = new mGage($config);
+    echo '- connectServiceObject mGage: ' . $this->message['user_country'], PHP_EOL;
+    $mobileServiceObject = new MB_mGage($config);
 
     return $mobileServiceObject;
   }
