@@ -55,20 +55,35 @@ class MB_mGage
    */
   public function  mobileOriginated($message) {
 
+    $bla = FALSE;
+if ($bla) {
+  $bla = TRUE;
+}
+
     $username = $this->config['username'];
     $password = $this->config['password'];
+
+    // Gatway
+    // $gatewayID = '115646';  // Gateway ID: https://communicatepro.mgage.com/consoleapp/viewTemplateProgram.jspx?id=115646
+    $gatewayID = '115658';
+
     // $optInListID = $message['opt_in_path_id'];
     $optInListID = '38383'; // Brazil
+    $optInListID = '66978'; // Friday 2 Shortcode
+
     // $optInKeyword = $message['opt_in_keyword'];
-    $optInKeyword = 'BZCGG'; // Brazil
-    // $mobileNumber = $message['mobile'];
-    $mobileNumber = '13479886705';
+    // $optInKeyword = 'BZCGG'; // Brazil
+    $optInKeyword = 'FREDFRI'; // US Test
+
+    $mobileNumber = $message['mobile'];
+    // $mobileNumber = '13479886705';  // Dee
+    // $mobileNumber = '17024390195';     // Freddie
 
     // Add user to list
     $moURL = self::BASE_URL . 'externalMO';
     $contentType = NULL;
     $postContent = [
-      'campid' => '115646',  // Gateway ID: https://communicatepro.mgage.com/consoleapp/viewTemplateProgram.jspx?id=115646
+      'campid' => $gatewayID,
       'destination' => $optInListID,
       'originator' => $mobileNumber,
       'message' => $optInKeyword,
@@ -82,12 +97,16 @@ class MB_mGage
      * telling you what youÕve done wrong.
      */
     if (isset($results[1]) && $results[1] != 200) {
+      $this->messageBroker->sendNack($message['payload']);
+      $this->statHat->ezCount('MBC_RegistrationMobile_Service_mGage: mobileOriginated error: ' . $status['error']->attributes()->{'message'});
       throw new Exception('Call to mobileOriginated returned error response: ' . $results[0] . ': ' .  $results[1]);
     }
     elseif ($results == 0) {
+      $this->messageBroker->sendNack($message['payload']);
       throw new Exception('Hmmm: No results returned from mGage mobileOriginated submission.');
     }
 
+    return $results;
   }
 
   /**
