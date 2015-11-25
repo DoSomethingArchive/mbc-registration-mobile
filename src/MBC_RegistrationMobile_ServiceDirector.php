@@ -54,6 +54,7 @@ class  MBC_RegistrationMobile_ServiceDirector
       // mobile service to use.
       case 'US':
       case 'CA':
+        echo '** Using Mobile Commons as Service', PHP_EOL;
         $mobileService = new MBC_RegistrationMobile_Service_MobileCommons($message);
 
         break;
@@ -69,12 +70,14 @@ class  MBC_RegistrationMobile_ServiceDirector
 
           case 'MX':
           case 'BR':
+            echo '** Using mGage as Service', PHP_EOL;
             $mobileService = new MBC_RegistrationMobile_Service_mGage($message);
 
             break;
 
           default:
             // Mobile numbers are not collected from users outside of US, CA, MX or BR. Default to Mobile Commons
+            echo '** Using Mobile Commons as Service', PHP_EOL;
             $mobileService = new MBC_RegistrationMobile_Service_MobileCommons($message);
 
         }
@@ -83,6 +86,7 @@ class  MBC_RegistrationMobile_ServiceDirector
 
       // User Import - all US based users.
       case 'MUI':
+        echo '** Using Mobile Commons as Service', PHP_EOL;
         $mobileService = new MBC_RegistrationMobile_Service_MobileCommons($message);
 
         break;
