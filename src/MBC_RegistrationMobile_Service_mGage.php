@@ -128,29 +128,16 @@ class  MBC_RegistrationMobile_Service_mGage extends MBC_RegistrationMobile_BaseS
    */
   public function process() {
 
-    $payload = $this->message['payload'];
-
     try {
 
-      $status = (array)$this->mobileServiceObject->mobileOriginated($this->message);
-      if (isset($status['error'])) {
-        echo '- Error - ' . $status['error']->attributes()->{'message'} , PHP_EOL;
-        echo '  Submitted: ' . print_r($this->message, TRUE), PHP_EOL;
-        $this->messageBroker->sendNack($payload);
-        // throw new Exception('');
-        $this->statHat->ezCount('MBC_RegistrationMobile_Service_MobileCommons: profiles_update error: ' . $status['error']->attributes()->{'message'});
-      }
-      else {
-        $this->messageBroker->sendAck($payload);
-        $this->statHat->ezCount('MBC_RegistrationMobile_Service_MobileCommons: profiles_update success');
-      }
-
-      echo '-> MBC_RegistrationMobile_Service_MobileCommons->process: ' . $this->message['phone_number'] . ' -------', PHP_EOL;
+      $status = $this->mobileServiceObject->mobileOriginated($this->message);
+      $this->messageBroker->sendAck($this->message['payload']);
+      $this->statHat->ezCount('MBC_RegistrationMobile_Service_mGage: mobileOriginated success');
+      echo '-> MBC_RegistrationMobile_Service_mGage->process: ' . $this->message['mobile'] . ' -------', PHP_EOL;
     }
     catch (Exception $e) {
-      trigger_error('mbc-registration-mobile ERROR - Failed to submit "profiles_update" to Mobile Commons API.', E_USER_WARNING);
       echo 'Excecption:' . print_r($e, TRUE), PHP_EOL;
-      $this->statHat->ezCount('MBC_RegistrationMobile_Service_MobileCommons: profiles_update error');
+      $this->statHat->ezCount('MBC_RegistrationMobile_Service_mGage: mobileOriginated error');
     }
 
   }
