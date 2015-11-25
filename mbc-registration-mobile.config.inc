@@ -59,6 +59,13 @@ $mbConfig->setProperty('mobileCommons_config', array(
   )
 ));
 
+$mobileConfig = $mbConfig->gatherSettings('mobile');
+$mbConfig->setProperty('communicatePro_config', array(
+  'settings' => $mobileConfig->mGage,
+  'username' => getenv("COMMUNICATE_PRO_USER"),
+  'password' => getenv("COMMUNICATE_PRO_PASSWORD")
+));
+
 // Create untility objects for access anywhere within the application as a single instance
 $mbConfig->setProperty('messageBroker_config', $mbConfig->constructRabbitConfig('transactionalExchange', array('mobileCommonsQueue')));
 $rabbitCredentials = $mbConfig->getProperty('rabbit_credentials');

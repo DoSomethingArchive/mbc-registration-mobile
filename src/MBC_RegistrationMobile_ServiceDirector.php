@@ -49,19 +49,44 @@ class  MBC_RegistrationMobile_ServiceDirector
 
     switch ($message['application_id']) {
 
+      // Affiliates sites
+      // @todo: Move to single Drupal app to host all affiliate sites, add support for user_country to define which
+      // mobile service to use.
       case 'US':
       case 'CA':
+        echo '** Using Mobile Commons as Service', PHP_EOL;
         $mobileService = new MBC_RegistrationMobile_Service_MobileCommons($message);
 
         break;
       
+      // Voting App
       case 'CGG':
       case 'AGG':
-        $mobileService = new MBC_RegistrationMobile_Service_MobileCommons($message);
+
+        echo '- MBC_RegistrationMobile_ServiceDirector->serviceFactory() user_country: ' . $message['user_country'], PHP_EOL;
+
+        // Support different SMS services by user country
+        switch ($message['user_country']) {
+
+          case 'MX':
+          case 'BR':
+            echo '** Using mGage as Service', PHP_EOL;
+            $mobileService = new MBC_RegistrationMobile_Service_mGage($message);
+
+            break;
+
+          default:
+            // Mobile numbers are not collected from users outside of US, CA, MX or BR. Default to Mobile Commons
+            echo '** Using Mobile Commons as Service', PHP_EOL;
+            $mobileService = new MBC_RegistrationMobile_Service_MobileCommons($message);
+
+        }
 
         break;
 
+      // User Import - all US based users.
       case 'MUI':
+        echo '** Using Mobile Commons as Service', PHP_EOL;
         $mobileService = new MBC_RegistrationMobile_Service_MobileCommons($message);
 
         break;

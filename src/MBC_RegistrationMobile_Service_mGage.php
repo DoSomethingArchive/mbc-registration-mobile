@@ -8,13 +8,14 @@ namespace DoSomething\MBC_RegistrationMobile;
 use DoSomething\StatHat\Client as StatHat;
 use DoSomething\MB_Toolbox\MB_Toolbox;
 use DoSomething\MB_Toolbox\MB_Configuration;
+use DoSomething\MBC_RegistrationMobile\mGage;
 use \Exception;
 
 /*
  * MBC_RegistrationMobile_Service_MobileCommons: Used to process the mobileCommonsQueue
  * entries for the Mobile Commons service.
  */
-class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobile_BaseService
+class  MBC_RegistrationMobile_Service_mGage extends MBC_RegistrationMobile_BaseService
 {
 
   /**
@@ -66,13 +67,13 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
    */
   public function __construct($message) {
 
+    $this->message = $message;
     $this->mbConfig = MB_Configuration::getInstance();
     $this->messageBroker = $this->mbConfig->getProperty('messageBroker');
     $this->statHat = $this->mbConfig->getProperty('statHat');
     $this->toolbox = $this->mbConfig->getProperty('mbToolbox');
 
-    $this->mobileServiceObject = $this->connectServiceObject($message['application_id']);
-    $this->message = $message;
+    $this->mobileServiceObject = $this->connectServiceObject($message['user_country']);
   }
 
   /**
@@ -87,19 +88,12 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
 
     // Mobile Commons, current supplier for US and CA requirements
     if (!isset($message['mobile'])) {
-      echo '** Service_MobileCommons canProcess(): mobile not set. Mobile Commons requires a mobile number for processing.', PHP_EOL;
+      echo '** canProcess(): mobile not set. mGage requires a mobile number for processing.', PHP_EOL;
       parent::reportErrorPayload();
       return FALSE;
     }
-    // Validate phone number based on the North American Numbering Plan
-    // https://en.wikipedia.org/wiki/North_American_Numbering_Plan
-    $regex = "/^(\d[\s-]?)?[\(\[\s-]{0,2}?\d{3}[\)\]\s-]{0,2}?\d{3}[\s-]?\d{4}$/i";
-    if (!(preg_match( $regex, $message['mobile']))) {
-      echo '** Service_MobileCommons canProcess(): Invalid phone number based on  North American Numbering Plan standard: ' .  $message['mobile'], PHP_EOL;
-      return FALSE;
-    }
     if (!isset($message['service_path_id'])) {
-      echo '** Service_MobileCommons canProcess(): service_path_id not set for mobile: ' . $message['mobile'] . '. Mobile Commons requires service_path_id (opt in) for processing.', PHP_EOL;
+      echo '** canProcess(): service_path_id not set for mobile: ' . $message['mobile'] . '. mGage requires service_path_id (opt in) for processing.', PHP_EOL;
       parent::reportErrorPayload();
       return FALSE;
     }
@@ -115,16 +109,16 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
    */
   public function setter($message) {
 
-    $this->message['phone_number'] = $message['mobile'];
-    unset($this->message['mobile']);
+    $this->message['mobile'] = $message['mobile'];
     if (isset($message['service_path_id'])) {
       $this->message['opt_in_path_id'] = $message['service_path_id'];
       unset($this->message['service_path_id']);
     }
 
-    // CGG
-    if (strtoupper($message['application_id']) == 'CGG' && isset($message['original']['candidate_name'])) {
-      $this->message['CGG2015_1st_vote'] = $message['original']['candidate_name'];
+    // AGG2015
+    if (strtoupper($message['application_id']) == 'AGG' && isset($message['original']['candidate_name'])) {
+      $this->message['AGG2015_1st_vote'] = $message['original']['candidate_name'];
+      $this->message['AGG2015_1st_vote_id'] = $message['original']['candidate_id'];
     }
 
   }
@@ -135,12 +129,10 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
   public function process() {
 
     $payload = $this->message['payload'];
-    unset($this->message['payload']);
-    unset($this->message['original']);
 
     try {
 
-      $status = (array)$this->mobileServiceObject->profiles_update($this->message);
+      $status = (array)$this->mobileServiceObject->mobileOriginated($this->message);
       if (isset($status['error'])) {
         echo '- Error - ' . $status['error']->attributes()->{'message'} , PHP_EOL;
         echo '  Submitted: ' . print_r($this->message, TRUE), PHP_EOL;
@@ -156,36 +148,32 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
       echo '-> MBC_RegistrationMobile_Service_MobileCommons->process: ' . $this->message['phone_number'] . ' -------', PHP_EOL;
     }
     catch (Exception $e) {
-      echo '** ERROR - Failed to submit "profiles_update" to Mobile Commons API.', PHP_EOL;
-      throw new Exception(print_r($e, TRUE));
+      trigger_error('mbc-registration-mobile ERROR - Failed to submit "profiles_update" to Mobile Commons API.', E_USER_WARNING);
+      echo 'Excecption:' . print_r($e, TRUE), PHP_EOL;
       $this->statHat->ezCount('MBC_RegistrationMobile_Service_MobileCommons: profiles_update error');
     }
 
   }
 
   /**
-   * connectService: instantiate object for mobile service based on the
-   * country code.
+   * connectService: Currently only establisheds mGage specific configuration property. In the future a mGage class to instantiate will be used.
    *
-   * @param string $affiliate
+   * @param string $userCountry
    *   The country code of the site that generated the message and thus the mobile service
    *   that needs to be connected to.
-   *
-   * @return object $mobileServiceObject
-   *   An object of a mobile service.
    */
-  public function connectServiceObject($affiliate) {
+  public function connectServiceObject($userCountry) {
 
-    $mobileCommonsConfig = $this->mbConfig->getProperty('mobileCommons_config');
+    $communicateProConfig = $this->mbConfig->getProperty('communicatePro_config');
 
     // @todo: trap undefined $affiliate values.
     $config = array(
-      'username' => $mobileCommonsConfig[$affiliate]['username'],
-      'password' => $mobileCommonsConfig[$affiliate]['password'],
-      'company_key' => $mobileCommonsConfig[$affiliate]['company_key'],
+      'username' => $communicateProConfig['username'],
+      'password' => $communicateProConfig['password'],
+      'optInID' => $this->message['service_path_id'],
     );
-    echo 'connectServiceObject company_key: ' . $mobileCommonsConfig[$affiliate]['company_key'], PHP_EOL;
-    $mobileServiceObject = new \MobileCommons($config);
+    echo '- connectServiceObject mGage: ' . $this->message['user_country'], PHP_EOL;
+    $mobileServiceObject = new MB_mGage($config);
 
     return $mobileServiceObject;
   }
