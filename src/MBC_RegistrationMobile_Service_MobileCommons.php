@@ -91,6 +91,13 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
       parent::reportErrorPayload();
       return FALSE;
     }
+    // Validate phone number based on the North American Numbering Plan
+    // https://en.wikipedia.org/wiki/North_American_Numbering_Plan
+    $regex = "/^(\d[\s-]?)?[\(\[\s-]{0,2}?\d{3}[\)\]\s-]{0,2}?\d{3}[\s-]?\d{4}$/i";
+    if (!(preg_match( $regex, $message['mobile']))) {
+      echo '** Service_MobileCommons canProcess(): Invalid phone number based on  North American Numbering Plan standard: ' .  $message['mobile'], PHP_EOL;
+      return FALSE;
+    }
     if (!isset($message['service_path_id'])) {
       echo '** Service_MobileCommons canProcess(): service_path_id not set for mobile: ' . $message['mobile'] . '. Mobile Commons requires service_path_id (opt in) for processing.', PHP_EOL;
       parent::reportErrorPayload();
@@ -149,8 +156,8 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
       echo '-> MBC_RegistrationMobile_Service_MobileCommons->process: ' . $this->message['phone_number'] . ' -------', PHP_EOL;
     }
     catch (Exception $e) {
-      trigger_error('mbc-registration-mobile ERROR - Failed to submit "profiles_update" to Mobile Commons API.', E_USER_WARNING);
-      echo 'Excecption:' . print_r($e, TRUE), PHP_EOL;
+      echo '** ERROR - Failed to submit "profiles_update" to Mobile Commons API.', PHP_EOL;
+      throw new Exception(print_r($e, TRUE));
       $this->statHat->ezCount('MBC_RegistrationMobile_Service_MobileCommons: profiles_update error');
     }
 
