@@ -1,4 +1,8 @@
 <?php
+/**
+ * Class related to mobile services used by DoSomething.org.
+ */
+
 namespace DoSomething\MBC_RegistrationMobile;
 
 use DoSomething\StatHat\Client as StatHat;
@@ -6,7 +10,7 @@ use DoSomething\MB_Toolbox\MB_Toolbox_BaseConsumer;
 use \Exception;
 
 /**
- * MBC_RegistrationMobileConsumer.class.in: Used to process the mobileCommonsQueue
+ * MBC_RegistrationMobileConsumer: Used to process the mobileCommonsQueue
  * entries that match the campaign.signup.* and user.registration.* bindings. Support
  * for different mobile services by affiliate is based on message application_id
  * (affiliate country) resulting in in instantiation of the appropreate service class.
@@ -31,14 +35,7 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
     echo '------ mbc-registration-mobile - MBC_RegistrationMobile_Consumer->consumeRegistrationMobileQueue() - ' . date('j D M Y G:i:s T') . ' START ------', PHP_EOL . PHP_EOL;
 
     parent::consumeQueue($payload);
-    if (isset($this->message['mobile'])) {
-      echo '** Consuming: ' . $this->message['mobile'];
-      if (isset($this->message['user_country'])) {
-        echo ' from: ' .  $this->message['user_country'] . ' doing: ' . $this->message['activity'], PHP_EOL;
-      } else {
-        echo ', user_country not defined.', PHP_EOL;
-      }
-    }
+    $this->logConsumption('mobile');
 
     if ($this->canProcess()) {
 
@@ -61,9 +58,7 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
 
     // @todo: Throttle the number of consumers running. Based on the number of messages
     // waiting to be processed start / stop consumers. Make "reactive"!
-    $queueMessages = parent::queueStatus('transactionalQueue');
-    echo '- queueMessages ready: ' . $queueMessages['ready'], PHP_EOL;
-    echo '- queueMessages unacked: ' . $queueMessages['unacked'], PHP_EOL;
+    $queueStatus = parent::queueStatus('transactionalQueue');
 
     echo  PHP_EOL . '------ mbc-registration-mobile - MBC_RegistrationMobile_Consumer->consumeRegistrationMobileQueue() - ' . date('j D M Y G:i:s T') . ' END ------', PHP_EOL . PHP_EOL;
   }
@@ -225,6 +220,26 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
 
     // Cleanup for next message
     unset($this->mobileMessage);
+  }
+
+  /**
+   * logConsumption(): Extend to log the status of processing a specific message
+   * element as well as the user_country and country.
+   *
+   * @param string $targetName
+   */
+  protected function logConsumption($targetName) {
+
+    if ($targetName != NULL) {
+      echo '** Consuming ' . $targetName . ': ' . $this->message[$targetName];
+      if (isset($this->message['user_country'])) {
+        echo ' from: ' .  $this->message['user_country'] . ' doing: ' . $this->message['activity'], PHP_EOL;
+      } else {
+        echo ', user_country not defined.', PHP_EOL;
+      }
+    } else {
+      echo $targetName . ' is not defined.', PHP_EOL;
+    }
   }
 
 }
