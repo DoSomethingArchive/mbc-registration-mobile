@@ -76,13 +76,13 @@ class MB_mGage
 
     // https://en.wikipedia.org/wiki/Telephone_numbers_in_Brazil
     if ($message['user_country'] == 'BR') {
-      $countryCode = '52';
+      $countryCode = '55';
       $optInListID = '38383';
       $optInKeyword = 'BZCGG';
     }
     // https://en.wikipedia.org/wiki/Telephone_numbers_in_Mexico
     elseif ($message['user_country'] == 'MX') {
-      $countryCode = '55';
+      $countryCode = '52';
       $optInListID = '86865';
       $optInKeyword = 'MXCGG';
     }
