@@ -235,7 +235,7 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
         echo ', user_country not defined.', PHP_EOL;
       }
     } else {
-      echo $targetName . ' is not defined.', PHP_EOL;
+      echo '- logConsumption tagetName: "' .$targetName . '" not defined.', PHP_EOL;
     }
   }
 
