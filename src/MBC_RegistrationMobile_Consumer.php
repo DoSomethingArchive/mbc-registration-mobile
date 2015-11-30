@@ -206,10 +206,7 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
         $mobileService->process();
       }
       catch(Exception $e) {
-        echo 'Error sending mobile number: ' . $this->message['mobile'] . ' to mobile service for user signup. Error: ' . $e->getMessage();
-
-        // Trow Exception to fall back to next try/catch
-
+        echo 'Error sending mobile number: ' . $this->mobileMessage['mobile'] . ' to mobile service for user signup. Error: ' . $e->getMessage();
       }
 
     }
