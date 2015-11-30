@@ -66,8 +66,13 @@ class MB_mGage
 
     // @todo: needs to come from producer, currently hard coded in logic below.
     $countryCode = NULL;
-    $optInListID = $message['opt_in_path_id'];
-    $optInKeyword = $message['opt_in_keyword'];
+
+    if (isset($message['opt_in_path_id'])) {
+      $optInListID = $message['opt_in_path_id'];
+    }
+    if (isset($message['opt_in_keyword'])) {
+      $optInKeyword = $message['opt_in_keyword'];
+    }
 
     // https://en.wikipedia.org/wiki/Telephone_numbers_in_Brazil
     if ($message['user_country'] == 'BR') {
