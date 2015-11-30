@@ -102,11 +102,8 @@ class MB_mGage
         'originator' => $mobileNumber,
         'message' => $optInKeyword,
       ];
-      echo '- mGage mobileOriginated moURL: ' . $moURL, PHP_EOL;
-      echo '- mGage mobileOriginated postContent: ' . print_r($postContent, TRUE), PHP_EOL;
 
       $results = $this->makeWebRequest($username, $password, $moURL, $contentType, $postContent);
-      echo '- mGage mobileOriginated results: ' . print_r($results, TRUE), PHP_EOL;
 
       /**
        * On success, the system will return a 200 header, and the word "SUCCESS".
@@ -134,6 +131,12 @@ class MB_mGage
    *
    */
   private function makeWebRequest($username, $password, $url, $contentType = NULL,$postContent = NULL) {
+
+    echo 'makeWebRequest:', PHP_EOL;
+    echo 'username:' . $username, PHP_EOL;
+    echo 'password:' . $password, PHP_EOL;
+    echo 'url:' . $url, PHP_EOL;
+    echo 'postContent:' . print_r($postContent, TRUE), PHP_EOL;
 
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
