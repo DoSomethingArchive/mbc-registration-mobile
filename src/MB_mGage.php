@@ -97,9 +97,10 @@ class MB_mGage
         'originator' => $mobileNumber,
         'message' => $optInKeyword,
       ];
-      echo '- mGage mobileOriginated submisison: ' . print_r($postContent, TRUE), PHP_EOL;
+      echo '- mGage mobileOriginated postContent: ' . print_r($postContent, TRUE), PHP_EOL;
 
       $results = $this->makeWebRequest($username, $password, $moURL, $contentType, $postContent);
+      echo '- mGage mobileOriginated results: ' . print_r($results, TRUE), PHP_EOL;
 
       /**
        * On success, the system will return a 200 header, and the word "SUCCESS".
@@ -107,7 +108,6 @@ class MB_mGage
        * telling you what you've done wrong.
        */
       if (isset($results[1]) && $results[1] != 200) {
-        $this->statHat->ezCount('MBC_RegistrationMobile_Service_mGage: mobileOriginated error: ' . $status['error']->attributes()->{'message'});
         throw new Exception('Call to mobileOriginated returned error response: ' . $results[0] . ': ' .  $results[1]);
       }
       elseif ($results == 0) {
