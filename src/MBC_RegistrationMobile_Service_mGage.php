@@ -132,12 +132,10 @@ class  MBC_RegistrationMobile_Service_mGage extends MBC_RegistrationMobile_BaseS
 
       $status = $this->mobileServiceObject->mobileOriginated($this->message);
       $this->messageBroker->sendAck($this->message['payload']);
-      $this->statHat->ezCount('MBC_RegistrationMobile_Service_mGage: mobileOriginated success');
       echo '-> MBC_RegistrationMobile_Service_mGage->process: ' . $this->message['mobile'] . ' -------', PHP_EOL;
     }
     catch (Exception $e) {
-      echo 'Excecption:' . print_r($e, TRUE), PHP_EOL;
-      $this->statHat->ezCount('MBC_RegistrationMobile_Service_mGage: mobileOriginated error');
+      echo '- MBC_RegistrationMobile_Service_mGage process() Exception:' . $e->getMessage(), PHP_EOL;
     }
 
   }

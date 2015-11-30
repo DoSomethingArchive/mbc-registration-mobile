@@ -102,6 +102,7 @@ class MB_mGage
         'originator' => $mobileNumber,
         'message' => $optInKeyword,
       ];
+      echo '- mGage mobileOriginated moURL: ' . $moURL, PHP_EOL;
       echo '- mGage mobileOriginated postContent: ' . print_r($postContent, TRUE), PHP_EOL;
 
       $results = $this->makeWebRequest($username, $password, $moURL, $contentType, $postContent);
