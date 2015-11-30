@@ -55,55 +55,70 @@ class MB_mGage
    */
   public function  mobileOriginated($message) {
 
-    $bla = FALSE;
-if ($bla) {
-  $bla = TRUE;
-}
-
     $username = $this->config['username'];
     $password = $this->config['password'];
 
     // Gatway
-    // $gatewayID = '115646';  // Gateway ID: https://communicatepro.mgage.com/consoleapp/viewTemplateProgram.jspx?id=115646
-    $gatewayID = '115658';
-
-    // $optInListID = $message['opt_in_path_id'];
-    $optInListID = '38383'; // Brazil
-    $optInListID = '66978'; // Friday 2 Shortcode
-
-    // $optInKeyword = $message['opt_in_keyword'];
-    // $optInKeyword = 'BZCGG'; // Brazil
-    $optInKeyword = 'FREDFRI'; // US Test
+    $gatewayID = '115646';  // Gateway ID: https://communicatepro.mgage.com/consoleapp/viewTemplateProgram.jspx?id=115646
+    // $gatewayID = '115658'; // Send tests to US based lists
 
     $mobileNumber = $message['mobile'];
-    // $mobileNumber = '13479886705';  // Dee
-    // $mobileNumber = '17024390195';     // Freddie
+
+    // @todo: needs to come from producer, currently hard coded in logic below.
+    $countryCode = NULL;
+    $optInListID = $message['opt_in_path_id'];
+    $optInKeyword = $message['opt_in_keyword'];
+
+    // https://en.wikipedia.org/wiki/Telephone_numbers_in_Brazil
+    if ($message['user_country'] == 'BR') {
+      $countryCode = '52';
+      $optInListID = '38383';
+      $optInKeyword = 'BZCGG';
+    }
+    // https://en.wikipedia.org/wiki/Telephone_numbers_in_Mexico
+    elseif ($message['user_country'] == 'MX') {
+      $countryCode = '55';
+      $optInListID = '86865';
+      $optInKeyword = 'MXCGG';
+    }
+
+    if (substr($mobileNumber, 0, 2) != $countryCode) {
+      $mobileNumber = $countryCode . $mobileNumber;
+    }
 
     // Add user to list
-    $moURL = self::BASE_URL . 'externalMO';
-    $contentType = NULL;
-    $postContent = [
-      'campid' => $gatewayID,
-      'destination' => $optInListID,
-      'originator' => $mobileNumber,
-      'message' => $optInKeyword,
-    ];
+    if (isset($countryCode)) {
 
-    $results = $this->makeWebRequest($username, $password, $moURL, $contentType, $postContent);
+      $moURL = self::BASE_URL . 'externalMO';
+      $contentType = NULL;
+      $postContent = [
+        'campid' => $gatewayID,
+        'destination' => $optInListID,
+        'originator' => $mobileNumber,
+        'message' => $optInKeyword,
+      ];
+      echo '- mGage mobileOriginated submisison: ' . print_r($postContent, TRUE), PHP_EOL;
 
-    /** 
-     * On success, the system will return a 200 header, and the word ÒSUCCESSÓ.
-     * On failure, the system will return a 500 header, and an English language error message
-     * telling you what youÕve done wrong.
-     */
-    if (isset($results[1]) && $results[1] != 200) {
-      $this->messageBroker->sendNack($message['payload']);
-      $this->statHat->ezCount('MBC_RegistrationMobile_Service_mGage: mobileOriginated error: ' . $status['error']->attributes()->{'message'});
-      throw new Exception('Call to mobileOriginated returned error response: ' . $results[0] . ': ' .  $results[1]);
+      $results = $this->makeWebRequest($username, $password, $moURL, $contentType, $postContent);
+
+      /**
+       * On success, the system will return a 200 header, and the word "SUCCESS".
+       * On failure, the system will return a 500 header, and an English language error message
+       * telling you what you've done wrong.
+       */
+      if (isset($results[1]) && $results[1] != 200) {
+        $this->statHat->ezCount('MBC_RegistrationMobile_Service_mGage: mobileOriginated error: ' . $status['error']->attributes()->{'message'});
+        throw new Exception('Call to mobileOriginated returned error response: ' . $results[0] . ': ' .  $results[1]);
+      }
+      elseif ($results == 0) {
+        throw new Exception('Hmmm: No results returned from mGage mobileOriginated submission.');
+      }
+
     }
-    elseif ($results == 0) {
-      $this->messageBroker->sendNack($message['payload']);
-      throw new Exception('Hmmm: No results returned from mGage mobileOriginated submission.');
+    else {
+      echo '- mobileOriginated: Unsupported country code: ' . $message['user_country'], PHP_EOL;
+      $this->messageBroker->sendAck($message['payload']);
+      $results = FALSE;
     }
 
     return $results;
