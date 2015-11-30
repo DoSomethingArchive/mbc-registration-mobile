@@ -132,11 +132,11 @@ class MB_mGage
    */
   private function makeWebRequest($username, $password, $url, $contentType = NULL,$postContent = NULL) {
 
-    echo 'makeWebRequest:', PHP_EOL;
-    echo 'username:' . $username, PHP_EOL;
-    echo 'password:' . $password, PHP_EOL;
-    echo 'url:' . $url, PHP_EOL;
-    echo 'postContent:' . print_r($postContent, TRUE), PHP_EOL;
+    echo '- makeWebRequest:', PHP_EOL;
+    echo '- username:' . $username, PHP_EOL;
+    echo '- password:' . $password, PHP_EOL;
+    echo '- url:' . $url, PHP_EOL;
+    echo '- postContent:' . print_r($postContent, TRUE), PHP_EOL;
 
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
@@ -154,6 +154,8 @@ class MB_mGage
     $results[0] = curl_exec($ch);
     $results[1] = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
+
+    echo '-> makeWebRequest results: ' . print_r($results, TRUE), PHP_EOL;
 
     return $results;
   }
