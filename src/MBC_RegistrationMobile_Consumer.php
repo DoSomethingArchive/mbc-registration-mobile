@@ -227,7 +227,7 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
    */
   protected function logConsumption($targetName) {
 
-    if ($targetName != NULL) {
+    if (isset($this->message[$targetName]) && $targetName != NULL) {
       echo '** Consuming ' . $targetName . ': ' . $this->message[$targetName];
       if (isset($this->message['user_country'])) {
         echo ' from: ' .  $this->message['user_country'] . ' doing: ' . $this->message['activity'], PHP_EOL;
