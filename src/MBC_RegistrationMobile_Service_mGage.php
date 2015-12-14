@@ -109,7 +109,13 @@ class  MBC_RegistrationMobile_Service_mGage extends MBC_RegistrationMobile_BaseS
    */
   public function setter($message) {
 
-    $this->message['mobile'] = $message['mobile'];
+    if ($message['user_country'] == 'BR' && strlen($message['mobile']) > 9) {
+      $this->message['mobile'] = substr($message['mobile'], 0, 9);
+    }
+    else {
+      $this->message['mobile'] = $message['mobile'];
+    }
+
     if (isset($message['service_path_id'])) {
       $this->message['opt_in_path_id'] = $message['service_path_id'];
       unset($this->message['service_path_id']);
@@ -155,7 +161,7 @@ class  MBC_RegistrationMobile_Service_mGage extends MBC_RegistrationMobile_BaseS
     $config = array(
       'username' => $communicateProConfig['username'],
       'password' => $communicateProConfig['password'],
-      'optInID' => $this->message['service_path_id'],
+      'mGagePathID' => $this->message['service_path_id'],
     );
     echo '- connectServiceObject mGage: ' . $this->message['user_country'], PHP_EOL;
     $mobileServiceObject = new MB_mGage($config);
