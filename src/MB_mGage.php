@@ -67,8 +67,8 @@ class MB_mGage
     // @todo: needs to come from producer, currently hard coded in logic below.
     $countryCode = NULL;
 
-    if (isset($message['opt_in_path_id'])) {
-      $optInListID = $message['opt_in_path_id'];
+    if (isset($message['mGagePathID'])) {
+      $optInListID = $message['mGagePathID'];
     }
     if (isset($message['opt_in_keyword'])) {
       $optInKeyword = $message['opt_in_keyword'];
