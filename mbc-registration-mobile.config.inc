@@ -1,6 +1,6 @@
 <?php
 /**
- * Message Broker configuration settings for mbc-import-logging
+ * Message Broker configuration settings for mbc-registration-mobile
  */
 
 use DoSomething\MB_Toolbox\MB_Configuration;
