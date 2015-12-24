@@ -92,6 +92,7 @@ class MB_mGage
     }
 
     // Add user to list
+    // Consider also using /saveProperties endpoint.
     if (isset($countryCode)) {
 
       $moURL = self::BASE_URL . 'externalMO';
