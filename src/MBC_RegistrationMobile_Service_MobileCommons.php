@@ -157,7 +157,7 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
     }
     catch (Exception $e) {
       echo '** ERROR - Failed to submit "profiles_update" to Mobile Commons API.', PHP_EOL;
-      throw new Exception(print_r($e, TRUE));
+      throw new Exception('** ERROR - Failed to submit "profiles_update" to Mobile Commons API. e: ' . $e);
       $this->statHat->ezCount('MBC_RegistrationMobile_Service_MobileCommons: profiles_update error');
     }
 
