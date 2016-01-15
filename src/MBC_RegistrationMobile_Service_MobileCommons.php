@@ -52,6 +52,13 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
   protected $mobileServiceObject;
 
   /**
+   * The name of the service.
+   *
+   * @var string
+   */
+  protected $mobileServiceName;
+
+  /**
    * Value of message from queue to be consumed / processed.
    *
    * @var array
@@ -72,6 +79,7 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
     $this->toolbox = $this->mbConfig->getProperty('mbToolbox');
 
     $this->mobileServiceObject = $this->connectServiceObject($message['application_id']);
+    $this->mobileServiceName = 'Mobile Commons';
     $this->message = $message;
   }
 

@@ -53,6 +53,13 @@ class  MBC_RegistrationMobile_Service_mGage extends MBC_RegistrationMobile_BaseS
   protected $mobileServiceObject;
 
   /**
+   * The name of the service.
+   *
+   * @var string
+   */
+  protected $mobileServiceName;
+
+  /**
    * Value of message from queue to be consumed / processed.
    *
    * @var array
@@ -74,6 +81,7 @@ class  MBC_RegistrationMobile_Service_mGage extends MBC_RegistrationMobile_BaseS
     $this->toolbox = $this->mbConfig->getProperty('mbToolbox');
 
     $this->mobileServiceObject = $this->connectServiceObject($message['user_country']);
+    $this->mobileServiceName = 'mGage';
   }
 
   /**

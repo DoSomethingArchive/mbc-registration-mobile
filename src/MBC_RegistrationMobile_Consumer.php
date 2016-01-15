@@ -17,9 +17,10 @@ use \Exception;
  */
 class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
 {
+  const RETRY_SECONDS = 20;
 
   /**
-   *
+   * Composed values processed from the original message.
    */
   protected $mobileMessage;
 
@@ -47,7 +48,17 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
         // Ack in Service process() due to nested try/catch
       }
       catch(Exception $e) {
-        echo 'Error sending mobile number: ' . $this->message['mobile'] . ' to mobile service for user signup. Error: ' . $e->getMessage();
+
+        if (strpos($e-getMessage(), 'Connection timed out') > 0) {
+          echo '** Connection timed out... waiting before retrying: ' . date('j D M Y G:i:s T') . ' - getMessage(): ' . $e-getMessage(), PHP_EOL;
+          sleep(self::RETRY_SECONDS);
+          $this->messageBroker->sendNack($this->message['payload']);
+          echo '- Nack sent: ' . date('j D M Y G:i:s T'), PHP_EOL . PHP_EOL;
+        }
+        else {
+          echo '- Not timeout error, holding message in unacked state: ' . date('j D M Y G:i:s T'), PHP_EOL;
+          // @todo: Send message to dead letter queue and ack message to allow consumer to continue processsing
+        }
       }
 
     }
@@ -206,7 +217,7 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
         $mobileService->process();
       }
       catch(Exception $e) {
-        echo 'Error sending mobile number: ' . $this->mobileMessage['mobile'] . ' to mobile service for user signup. Error: ' . $e->getMessage();
+        echo 'Error sending mobile number: ' . $this->mobileMessage['mobile'] . ' to mobile ' . $mobileService->mobileServiceName . ' service for user signup. Error: ' . $e->getMessage();
       }
 
     }
