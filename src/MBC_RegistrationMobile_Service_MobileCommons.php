@@ -56,7 +56,7 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
    *
    * @var string
    */
-  protected $mobileServiceName;
+  public $mobileServiceName;
 
   /**
    * Value of message from queue to be consumed / processed.
@@ -153,8 +153,8 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
         echo '- Error - ' . $status['error']->attributes()->{'message'} , PHP_EOL;
         echo '  Submitted: ' . print_r($this->message, TRUE), PHP_EOL;
         $this->messageBroker->sendNack($payload);
-        // throw new Exception('');
         $this->statHat->ezCount('MBC_RegistrationMobile_Service_MobileCommons: profiles_update error: ' . $status['error']->attributes()->{'message'});
+        throw new Exception($status['error']->attributes()->{'message'});
       }
       else {
         $this->messageBroker->sendAck($payload);
@@ -164,8 +164,7 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
       echo '-> MBC_RegistrationMobile_Service_MobileCommons->process: ' . $this->message['phone_number'] . ' -------', PHP_EOL;
     }
     catch (Exception $e) {
-      echo '** ERROR - Failed to submit "profiles_update" to Mobile Commons API.', PHP_EOL;
-      throw new Exception('** ERROR - Failed to submit "profiles_update" to Mobile Commons API. e: ' . $e);
+      throw new Exception($e->getMessage());
       $this->statHat->ezCount('MBC_RegistrationMobile_Service_MobileCommons: profiles_update error');
     }
 
