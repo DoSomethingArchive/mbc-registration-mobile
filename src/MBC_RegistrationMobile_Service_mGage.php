@@ -57,7 +57,7 @@ class  MBC_RegistrationMobile_Service_mGage extends MBC_RegistrationMobile_BaseS
    *
    * @var string
    */
-  protected $mobileServiceName;
+  public $mobileServiceName;
 
   /**
    * Value of message from queue to be consumed / processed.
