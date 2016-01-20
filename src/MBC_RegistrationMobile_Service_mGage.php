@@ -19,54 +19,6 @@ class  MBC_RegistrationMobile_Service_mGage extends MBC_RegistrationMobile_BaseS
 {
 
   /**
-   * Singleton instance of MB_Configuration application settings and service objects
-   *
-   * @var object
-   */
-  protected $mbConfig;
-
-  /**
-   * Message Broker connection to RabbitMQ
-   *
-   * @var object
-   */
-  protected $messageBroker;
-  
-  /**
-   * StatHat object for logging of activity
-   *
-   * @var object
-   */
-  protected $statHat;
-  
-  /**
-   * Message Broker Toolbox - collection of utility methods used by many of the
-   * Message Broker producer and consumer applications.
-   *
-   * @var object
-   */
-  protected $toolbox;
-
-  /**
-   * Connection to mobile service to send message details to.
-   */
-  protected $mobileServiceObject;
-
-  /**
-   * The name of the service.
-   *
-   * @var string
-   */
-  public $mobileServiceName;
-
-  /**
-   * Value of message from queue to be consumed / processed.
-   *
-   * @var array
-   */
-  protected $message;
-  
-  /**
    * Constructor for MBC_BaseConsumer - all consumer applications should extend this base class.
    *
    * @param array $message
@@ -74,13 +26,7 @@ class  MBC_RegistrationMobile_Service_mGage extends MBC_RegistrationMobile_BaseS
    */
   public function __construct($message) {
 
-    $this->message = $message;
-    $this->mbConfig = MB_Configuration::getInstance();
-    $this->messageBroker = $this->mbConfig->getProperty('messageBroker');
-    $this->statHat = $this->mbConfig->getProperty('statHat');
-    $this->toolbox = $this->mbConfig->getProperty('mbToolbox');
-
-    $this->mobileServiceObject = $this->connectServiceObject($message['user_country']);
+    parent::__construct();
     $this->mobileServiceName = 'mGage';
   }
 

@@ -55,6 +55,18 @@ abstract class MBC_RegistrationMobile_BaseService
   protected $message;
 
   /**
+   * Connection to mobile service to send message details to.
+   */
+  protected $mobileServiceObject;
+
+  /**
+   * The name of the service.
+   *
+   * @var string
+   */
+  public $mobileServiceName;
+
+  /**
    * Constructor for MBC_BaseConsumer - all consumer applications should extend this base class.
    *
    * @param array $message
@@ -68,6 +80,7 @@ abstract class MBC_RegistrationMobile_BaseService
     $this->toolbox = $this->mbConfig->getProperty('mbToolbox');
 
     $this->message = $message;
+    $this->mobileServiceObject = $this->connectServiceObject($message['user_country']);
   }
 
   /**
