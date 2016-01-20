@@ -25,7 +25,7 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
    */
   public function __construct($message) {
 
-    parent::__construct();
+    parent::__construct($message);
     $this->mobileServiceName = 'Mobile Commons';
   }
 

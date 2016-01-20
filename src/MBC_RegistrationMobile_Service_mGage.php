@@ -26,7 +26,7 @@ class  MBC_RegistrationMobile_Service_mGage extends MBC_RegistrationMobile_BaseS
    */
   public function __construct($message) {
 
-    parent::__construct();
+    parent::__construct($message);
     $this->mobileServiceName = 'mGage';
   }
 
