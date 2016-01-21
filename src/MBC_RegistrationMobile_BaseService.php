@@ -76,6 +76,7 @@ abstract class MBC_RegistrationMobile_BaseService
 
     $this->mbConfig = MB_Configuration::getInstance();
     $this->messageBroker = $this->mbConfig->getProperty('messageBroker');
+    $this->messageBroker_deadLetter = $this->mbConfig->getProperty('messageBroker_deadLetter');
     $this->statHat = $this->mbConfig->getProperty('statHat');
     $this->toolbox = $this->mbConfig->getProperty('mbToolbox');
 
@@ -92,6 +93,18 @@ abstract class MBC_RegistrationMobile_BaseService
     unset($errorPayload['payload']);
     unset($errorPayload['original']);
     echo '-> message: ' . print_r($errorPayload, TRUE), PHP_EOL;
+  }
+
+  /**
+   * deadLetter() - send message and related error to queue. Allows processing queues to be unblocked
+   * and log problem messages with details of the error resulting from the message.
+   */
+  public function deadLetter($message, $location, $error) {
+
+    $message['incidentDate'] = date(DATE_RFC2822);
+    $message['location'] = $location;
+    $message['error'] = $error;
+    $this->messageBroker_deadLetter->publish($message, 'messageBroker_deadLetter');
   }
 
   /**
