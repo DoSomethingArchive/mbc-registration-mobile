@@ -67,10 +67,12 @@ $mbConfig->setProperty('communicatePro_config', array(
 ));
 
 // Create untility objects for access anywhere within the application as a single instance
-$mbConfig->setProperty('messageBroker_config', $mbConfig->constructRabbitConfig('transactionalExchange', array('mobileCommonsQueue')));
+$messageBrokerConfig = $mbConfig->constructRabbitConfig('transactionalExchange', ['mobileCommonsQueue']);
 $rabbitCredentials = $mbConfig->getProperty('rabbit_credentials');
-$messageBrokerConfig = $mbConfig->getProperty('messageBroker_config');
 $mbConfig->setProperty('messageBroker', new MessageBroker($rabbitCredentials, $messageBrokerConfig));
+
+$messageBrokerConfig = $mbConfig->constructRabbitConfig('directDeadLetterExchange', ['deadLetterQueue']);
+$mbConfig->setProperty('messageBroker_deadLetter', new MessageBroker($rabbitCredentials, $messageBrokerConfig));
 
 $mbConfig->setProperty('statHat', new StatHat([
   'ez_key' => getenv("STATHAT_EZKEY"),
