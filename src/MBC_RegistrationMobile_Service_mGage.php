@@ -96,6 +96,8 @@ class  MBC_RegistrationMobile_Service_mGage extends MBC_RegistrationMobile_BaseS
     }
     catch (Exception $e) {
       echo '- MBC_RegistrationMobile_Service_mGage process() Exception:' . $e->getMessage(), PHP_EOL;
+      parent::deadLetter($this->message['original'], 'MBC_RegistrationMobile_Service_mGage->process()->mobileServiceObject->mobileOriginated Error', $e->getMessage());
+      $this->messageBroker->sendNack($this->message['payload'], false, false);
     }
 
   }
