@@ -104,7 +104,8 @@ abstract class MBC_RegistrationMobile_BaseService
     $message['incidentDate'] = date(DATE_RFC2822);
     $message['location'] = $location;
     $message['error'] = $error;
-    $this->messageBroker_deadLetter->publish($message, 'messageBroker_deadLetter');
+    $message = json_encode($message);
+    $this->messageBroker_deadLetter->publish($message, 'deadLetter');
   }
 
   /**
