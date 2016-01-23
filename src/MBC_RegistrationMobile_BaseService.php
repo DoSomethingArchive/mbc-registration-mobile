@@ -81,7 +81,7 @@ abstract class MBC_RegistrationMobile_BaseService
     $this->toolbox = $this->mbConfig->getProperty('mbToolbox');
 
     $this->message = $message;
-    $this->mobileServiceObject = $this->connectServiceObject($message['user_country']);
+    $this->mobileServiceObject = $this->connectServiceObject($message['campaign_country']);
   }
 
   /**
