@@ -81,7 +81,8 @@ abstract class MBC_RegistrationMobile_BaseService
     $this->toolbox = $this->mbConfig->getProperty('mbToolbox');
 
     $this->message = $message;
-    $this->mobileServiceObject = $this->connectServiceObject($message['campaign_country']);
+    $targetCountry = $this->targetCountryRules($message);
+    $this->mobileServiceObject = $this->connectServiceObject($targetCountry);
   }
 
   /**
@@ -106,6 +107,20 @@ abstract class MBC_RegistrationMobile_BaseService
     $message['error'] = $error;
     $message = json_encode($message);
     $this->messageBroker_deadLetter->publish($message, 'deadLetter');
+  }
+
+  /**
+   * Collection of rules to follow to define which mobile service to submit message request.
+   */
+  private function targetCountryRules($message) {
+
+    if (isset($message['campaign_country']) && $message['campaign_country'] != 'global') {
+      return $message['campaign_country'];
+    }
+    if (isset($message['application_id'])) {
+      return $message['application_id'];
+    }
+
   }
 
   /**
