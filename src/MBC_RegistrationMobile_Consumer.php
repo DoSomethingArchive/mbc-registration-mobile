@@ -130,6 +130,9 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
     if (isset($message['user_country'])) {
       $this->mobileMessage['user_country'] = $message['user_country'];
     }
+    if (isset($message['campaign_country'])) {
+      $this->mobileMessage['campaign_country'] = $message['campaign_country'];
+    }
 
     // Set by origin of where user data was collected - typically Message
     // Broker user import but could also be external producers
