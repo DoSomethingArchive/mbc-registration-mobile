@@ -123,12 +123,16 @@ abstract class MBC_RegistrationMobile_BaseService
    */
   private function targetCountryRules($message) {
 
+    // Disabled as needs to be moved to each service class. When other services besides Mobile Commons
+    // are supported for the "US" app this will need to be in place.
+    /*
     if (isset($message['campaign_country']) && $message['campaign_country'] != 'global') {
       return $message['campaign_country'];
     }
     if (isset($message['user_country'])) {
       return $message['user_country'];
     }
+    */
     if (isset($message['application_id'])) {
       return $message['application_id'];
     }
