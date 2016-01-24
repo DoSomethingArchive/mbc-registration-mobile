@@ -33,6 +33,13 @@ abstract class MBC_RegistrationMobile_BaseService
   protected $messageBroker;
 
   /**
+   * Message Broker connection to RabbitMQ for Dead Letter messages.
+   *
+   * @var object
+   */
+  protected $messageBroker_deadLetter;
+
+  /**
    * StatHat object for logging of activity
    *
    * @var object
