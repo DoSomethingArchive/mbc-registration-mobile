@@ -49,15 +49,22 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
       }
       catch(Exception $e) {
 
-        if (strpos($e->getMessage(), 'Connection timed out') > 0) {
+        if (!(strpos($e->getMessage(), 'Connection timed out') === false)) {
           echo '** Connection timed out... waiting before retrying: ' . date('j D M Y G:i:s T') . ' - getMessage(): ' . $e-getMessage(), PHP_EOL;
           sleep(self::RETRY_SECONDS);
           $this->messageBroker->sendNack($this->message['payload']);
-          echo '- Nack sent: ' . date('j D M Y G:i:s T'), PHP_EOL . PHP_EOL;
+          echo '- Nack sent to requeue message: ' . date('j D M Y G:i:s T'), PHP_EOL . PHP_EOL;
+        }
+        elseif (!(strpos($e->getMessage(), 'Failed to connect') === false)) {
+          echo '** Failed to connect... waiting before retrying: ' . date('j D M Y G:i:s T') . ' - getMessage(): ' . $e-getMessage(), PHP_EOL;
+          sleep(self::RETRY_SECONDS);
+          $this->messageBroker->sendNack($this->message['payload']);
+          echo '- Nack sent to requeue message: ' . date('j D M Y G:i:s T'), PHP_EOL . PHP_EOL;
         }
         else {
-          echo '- Not timeout error, holding message in unacked state: ' . date('j D M Y G:i:s T'), PHP_EOL;
-          // @todo: Send message to dead letter queue and ack message to allow consumer to continue processsing
+          echo '- Not timeout or connection error, message to deadLetterQueue: ' . date('j D M Y G:i:s T'), PHP_EOL;
+          echo '- Error message: ' . $e->getMessage(), PHP_EOL;
+          parent::deadLetter($this->message, 'MBC_RegistrationMobile_Consumer->consumeRegistrationMobileQueue() Error', $e->getMessage());
         }
       }
 
@@ -220,8 +227,7 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
         $mobileService->process();
       }
       catch(Exception $e) {
-        echo '** Error sending mobile number: ' . $this->mobileMessage['mobile'] . ' to mobile ' . $mobileService->mobileServiceName . ' service for user signup.', PHP_EOL;
-        echo $e->getMessage(), PHP_EOL;
+        echo '** process(): Error sending mobile number: ' . $this->mobileMessage['mobile'] . ' to mobile ' . $mobileService->mobileServiceName . ' service for user signup.', PHP_EOL;
       }
 
     }
