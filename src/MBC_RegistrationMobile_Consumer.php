@@ -49,7 +49,7 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
       }
       catch(Exception $e) {
 
-        if (strpos($e-getMessage(), 'Connection timed out') > 0) {
+        if (strpos($e->getMessage(), 'Connection timed out') > 0) {
           echo '** Connection timed out... waiting before retrying: ' . date('j D M Y G:i:s T') . ' - getMessage(): ' . $e-getMessage(), PHP_EOL;
           sleep(self::RETRY_SECONDS);
           $this->messageBroker->sendNack($this->message['payload']);

@@ -111,11 +111,16 @@ abstract class MBC_RegistrationMobile_BaseService
 
   /**
    * Collection of rules to follow to define which mobile service to submit message request.
+   *
+   * @todo: Move to specific service class as rules depend on the service.
    */
   private function targetCountryRules($message) {
 
     if (isset($message['campaign_country']) && $message['campaign_country'] != 'global') {
       return $message['campaign_country'];
+    }
+    if (isset($message['user_country'])) {
+      return $message['user_country'];
     }
     if (isset($message['application_id'])) {
       return $message['application_id'];
