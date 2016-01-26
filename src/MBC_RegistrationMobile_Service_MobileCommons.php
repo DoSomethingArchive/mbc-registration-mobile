@@ -138,8 +138,18 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
       'password' => $mobileCommonsConfig[$affiliate]['password'],
       'company_key' => $mobileCommonsConfig[$affiliate]['company_key'],
     );
-    echo 'connectServiceObject company_key: ' . $mobileCommonsConfig[$affiliate]['company_key'], PHP_EOL;
-    $mobileServiceObject = new \MobileCommons($config);
+    echo '-> connectServiceObject company_key: ' . $mobileCommonsConfig[$affiliate]['company_key'], PHP_EOL;
+
+    try {
+      $mobileServiceObject = new \MobileCommons($config);
+      if (!(is_object($mobileServiceObject))) {
+        throw new Exception('connectServiceObject(): Connection to Mobile Commons failed.');
+      }
+    }
+    catch (Exception $e) {
+      $this->statHat->ezCount('MBC_RegistrationMobile_Service_MobileCommons: object connection error');
+      throw new Exception($e->getMessage());
+    }
 
     return $mobileServiceObject;
   }
