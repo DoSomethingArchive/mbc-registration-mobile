@@ -25,11 +25,10 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
   protected $mobileMessage;
 
   /**
-   * Initial method triggered by blocked call in mbc-registration-mobile.php. The $payload is the
-   * contents of the message being processed from the queue.
+   * Initial method triggered by blocked call in mbc-registration-mobile.php.
    *
    * @param array $payload
-   *   The contents of the queue entry
+   *   The contents of the queue entry message being processed.
    */
   public function consumeRegistrationMobileQueue($payload) {
 
@@ -210,7 +209,7 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
   }
 
   /**
-   * Method to process image.
+   * Method to process mobile number.
    *
    * @param array $payload
    *   The contents of the queue entry
@@ -228,6 +227,7 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
       }
       catch(Exception $e) {
         echo '** process(): Error sending mobile number: ' . $this->mobileMessage['mobile'] . ' to mobile ' . $mobileService->mobileServiceName . ' service for user signup.', PHP_EOL;
+        throw $e;
       }
 
     }
@@ -256,7 +256,7 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
         echo ', user_country not defined.', PHP_EOL;
       }
     } else {
-      echo '- logConsumption tagetName: "' .$targetName . '" not defined.', PHP_EOL;
+      echo '- logConsumption tagetName: "' . $targetName . '" not defined.', PHP_EOL;
     }
   }
 
