@@ -55,7 +55,7 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
           echo '- Nack sent to requeue message: ' . date('j D M Y G:i:s T'), PHP_EOL . PHP_EOL;
         }
         elseif (!(strpos($e->getMessage(), 'Failed to connect') === false)) {
-          echo '** Failed to connect... waiting before retrying: ' . date('j D M Y G:i:s T') . ' - getMessage(): ' . $e-getMessage(), PHP_EOL;
+          echo '** Failed to connect... waiting before retrying: ' . date('j D M Y G:i:s T') . ' - getMessage(): ' . $e->getMessage(), PHP_EOL;
           sleep(self::RETRY_SECONDS);
           $this->messageBroker->sendNack($this->message['payload']);
           echo '- Nack sent to requeue message: ' . date('j D M Y G:i:s T'), PHP_EOL . PHP_EOL;
