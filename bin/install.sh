@@ -10,7 +10,7 @@ cd ../messagebroker-config
 MBCONFIG=`pwd`
 
 # Back to mbc-registration-mobile
-cd ../mbc-user-import
+cd ../mbc-registration-mobile
 
 # Create SymLink for mbc-registration-mobile application to make reference to for all Message Broker configuration settings
 ln -s $MBCONFIG .
