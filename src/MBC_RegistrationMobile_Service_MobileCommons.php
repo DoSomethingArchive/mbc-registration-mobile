@@ -82,10 +82,10 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
     }
 
     // AfterSchool user import
-    if (isset($message['hs_name'])) {
+    if (isset($message['original']['hs_name'])) {
       $this->message['hs_name'] = $message['original']['hs_name'];
     }
-    if (isset($message['hs_id'])) {
+    if (isset($message['original']['hs_id'])) {
       $this->message['hs_id'] = $message['original']['hs_id'];
     }
   }
