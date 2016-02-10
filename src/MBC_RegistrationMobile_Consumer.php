@@ -35,42 +35,42 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
     echo '------ mbc-registration-mobile - MBC_RegistrationMobile_Consumer->consumeRegistrationMobileQueue() - ' . date('j D M Y G:i:s T') . ' START ------', PHP_EOL . PHP_EOL;
 
     parent::consumeQueue($payload);
-    $this->logConsumption('mobile');
 
-    if ($this->canProcess()) {
+    try {
 
-      try {
+      if ($this->canProcess()) {
 
+        $this->logConsumption(['mobile']);
         $this->setter($this->message);
         $this->process();
 
         // Ack in Service process() due to nested try/catch
-      }
-      catch(Exception $e) {
 
-        if (!(strpos($e->getMessage(), 'Connection timed out') === false)) {
-          echo '** Connection timed out... waiting before retrying: ' . date('j D M Y G:i:s T') . ' - getMessage(): ' . $e-getMessage(), PHP_EOL;
-          sleep(self::RETRY_SECONDS);
-          $this->messageBroker->sendNack($this->message['payload']);
-          echo '- Nack sent to requeue message: ' . date('j D M Y G:i:s T'), PHP_EOL . PHP_EOL;
-        }
-        elseif (!(strpos($e->getMessage(), 'Failed to connect') === false)) {
-          echo '** Failed to connect... waiting before retrying: ' . date('j D M Y G:i:s T') . ' - getMessage(): ' . $e->getMessage(), PHP_EOL;
-          sleep(self::RETRY_SECONDS);
-          $this->messageBroker->sendNack($this->message['payload']);
-          echo '- Nack sent to requeue message: ' . date('j D M Y G:i:s T'), PHP_EOL . PHP_EOL;
-        }
-        else {
-          echo '- Not timeout or connection error, message to deadLetterQueue: ' . date('j D M Y G:i:s T'), PHP_EOL;
-          echo '- Error message: ' . $e->getMessage(), PHP_EOL;
-          parent::deadLetter($this->message, 'MBC_RegistrationMobile_Consumer->consumeRegistrationMobileQueue() Error', $e->getMessage());
-        }
       }
-
+      else {
+        echo '- failed canProcess(), removing from queue.', PHP_EOL;
+        $this->messageBroker->sendAck($this->message['payload']);
+      }
     }
-    else {
-      echo '- failed canProcess(), removing from queue.', PHP_EOL;
-      $this->messageBroker->sendAck($this->message['payload']);
+    catch(Exception $e) {
+
+      if (!(strpos($e->getMessage(), 'Connection timed out') === false)) {
+        echo '** Connection timed out... waiting before retrying: ' . date('j D M Y G:i:s T') . ' - getMessage(): ' . $e-getMessage(), PHP_EOL;
+        sleep(self::RETRY_SECONDS);
+        $this->messageBroker->sendNack($this->message['payload']);
+        echo '- Nack sent to requeue message: ' . date('j D M Y G:i:s T'), PHP_EOL . PHP_EOL;
+      }
+      elseif (!(strpos($e->getMessage(), 'Failed to connect') === false)) {
+        echo '** Failed to connect... waiting before retrying: ' . date('j D M Y G:i:s T') . ' - getMessage(): ' . $e->getMessage(), PHP_EOL;
+        sleep(self::RETRY_SECONDS);
+        $this->messageBroker->sendNack($this->message['payload']);
+        echo '- Nack sent to requeue message: ' . date('j D M Y G:i:s T'), PHP_EOL . PHP_EOL;
+      }
+      else {
+        echo '- Not timeout or connection error, message to deadLetterQueue: ' . date('j D M Y G:i:s T'), PHP_EOL;
+        echo '- Error message: ' . $e->getMessage(), PHP_EOL;
+        parent::deadLetter($this->message, 'MBC_RegistrationMobile_Consumer->consumeRegistrationMobileQueue() Error', $e->getMessage());
+      }
     }
 
     // @todo: Throttle the number of consumers running. Based on the number of messages
@@ -246,17 +246,28 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
    *
    * @param string $targetName
    */
-  protected function logConsumption($targetName = NULL) {
+  protected function logConsumption($targetNames = null) {
 
-    if (isset($this->message[$targetName]) && $targetName != NULL) {
-      echo '** Consuming ' . $targetName . ': ' . $this->message[$targetName];
+    echo '** Consuming ';
+    $targetNameFound = false;
+    foreach ($targetNames as $targetName) {
+      if (isset($this->message[$targetName])) {
+        if ($targetNameFound) {
+           echo ', ';
+        }
+        echo $targetName . ': ' . $this->message[$targetName];
+        $targetNameFound = true;
+      }
+    }
+    if ($targetNameFound) {
       if (isset($this->message['user_country'])) {
         echo ' from: ' .  $this->message['user_country'] . ' doing: ' . $this->message['activity'], PHP_EOL;
       } else {
         echo ', user_country not defined.', PHP_EOL;
       }
-    } else {
-      echo '- logConsumption tagetName: "' . $targetName . '" not defined.', PHP_EOL;
+    }
+    else {
+      echo 'xx Target property not found in message.', PHP_EOL;
     }
   }
 
