@@ -81,6 +81,13 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
       $this->message['CGG2015_1st_vote'] = $message['original']['candidate_name'];
     }
 
+    // AfterSchool user import
+    if (isset($message['original']['hs_name'])) {
+      $this->message['hs_name'] = $message['original']['hs_name'];
+    }
+    if (isset($message['original']['hs_id'])) {
+      $this->message['hs_id'] = $message['original']['hs_id'];
+    }
   }
 
   /**
