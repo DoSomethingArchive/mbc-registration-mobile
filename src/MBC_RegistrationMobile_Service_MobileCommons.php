@@ -88,8 +88,8 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
     if (isset($message['original']['hs_id'])) {
       $this->message['hs_id'] = $message['original']['hs_id'];
     }
-    if (isset($message['original']['optin'])) {
-      $this->message['afterschool_optin'] = $message['original']['optin'];
+    if (isset($message['original']['afterschool_optin'])) {
+      $this->message['afterschool_optin'] = $message['original']['afterschool_optin'];
     }
   }
 
