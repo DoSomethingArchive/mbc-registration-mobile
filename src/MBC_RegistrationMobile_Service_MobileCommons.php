@@ -64,6 +64,9 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
   /**
    * Sets values for processing based on contents of message from consumed queue.
    *
+   * Based on Mobilke Commons API: profile_update:
+   * https://mobilecommons.zendesk.com/hc/en-us/articles/202052534-REST-API#ProfileUpdate
+   *
    * @param array $message
    *  The payload of the unseralized message being processed.
    */
@@ -76,12 +79,49 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
       unset($this->message['service_path_id']);
     }
 
-    // CGG
+    if (isset($message['postal_code'])) {
+      $this->message['postal_code'] = $message['postal_code'];
+    }
+    if (isset($message['zip'])) {
+      $this->message['postal_code'] = $message['zip'];
+    }
+    if (isset($message['first_name'])) {
+      $this->message['first_name'] = $message['first_name'];
+    }
+    if (isset($message['last_name'])) {
+      $this->message['last_name'] = $message['last_name'];
+    }
+    if (isset($message['street1'])) {
+      $this->message['street1'] = $message['street1'];
+    }
+    elseif (isset($message['address1'])) {
+      $this->message['street1'] = $message['address1'];
+    }
+    if (isset($message['street2'])) {
+      $this->message['street2'] = $message['street2'];
+    }
+    elseif (isset($message['address2'])) {
+      $this->message['street1'] = $message['address2'];
+    }
+    if (isset($message['city'])) {
+      $this->message['city'] = $message['city'];
+    }
+    if (isset($message['state'])) {
+      $this->message['state'] = $message['state'];
+    }
+    elseif (isset($message['province'])) {
+      $this->message['state'] = $message['province'];
+    }
+    if (isset($message['country'])) {
+      $this->message['country'] = $message['country'];
+    }
+
+    // CGG - custom profile fields
     if (strtoupper($message['application_id']) == 'CGG' && isset($message['original']['candidate_name'])) {
       $this->message['CGG2015_1st_vote'] = $message['original']['candidate_name'];
     }
 
-    // AfterSchool user import
+    // AfterSchool user import - custom profile fields
     if (isset($message['original']['hs_name'])) {
       $this->message['hs_name'] = $message['original']['hs_name'];
     }
