@@ -43,12 +43,13 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
         $this->logConsumption(['mobile']);
         $this->setter($this->message);
         $this->process();
+        $this->statHat->ezCount('mbc-registration-mobile: MBC_RegistrationMobile_Consumer: process', 1);
 
         // Ack in Service process() due to nested try/catch
-
       }
       else {
         echo '- failed canProcess(), removing from queue.', PHP_EOL;
+        $this->statHat->ezCount('mbc-registration-mobile: MBC_RegistrationMobile_Consumer: skipping', 1);
         $this->messageBroker->sendAck($this->message['payload']);
       }
     }
@@ -56,6 +57,7 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
 
       if (!(strpos($e->getMessage(), 'Connection timed out') === false)) {
         echo '** Connection timed out... waiting before retrying: ' . date('j D M Y G:i:s T') . ' - getMessage(): ' . $e-getMessage(), PHP_EOL;
+        $this->statHat->ezCount('mbc-registration-mobile: MBC_RegistrationMobile_Consumer: Exception: Connection timed out', 1);
         sleep(self::RETRY_SECONDS);
         $this->messageBroker->sendNack($this->message['payload']);
         echo '- Nack sent to requeue message: ' . date('j D M Y G:i:s T'), PHP_EOL . PHP_EOL;
@@ -65,10 +67,12 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
         sleep(self::RETRY_SECONDS);
         $this->messageBroker->sendNack($this->message['payload']);
         echo '- Nack sent to requeue message: ' . date('j D M Y G:i:s T'), PHP_EOL . PHP_EOL;
+        $this->statHat->ezCount('mbc-registration-mobile: MBC_RegistrationMobile_Consumer: Exception: Failed to connect', 1);
       }
       else {
         echo '- Not timeout or connection error, message to deadLetterQueue: ' . date('j D M Y G:i:s T'), PHP_EOL;
         echo '- Error message: ' . $e->getMessage(), PHP_EOL;
+        $this->statHat->ezCount('mbc-registration-mobile: MBC_RegistrationMobile_Consumer: Exception: deadLetter', 1);
         parent::deadLetter($this->message, 'MBC_RegistrationMobile_Consumer->consumeRegistrationMobileQueue() Error', $e->getMessage());
       }
     }
