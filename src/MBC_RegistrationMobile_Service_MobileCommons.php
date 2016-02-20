@@ -151,18 +151,18 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
         echo '  Submitted: ' . print_r($this->message, TRUE), PHP_EOL;
         parent::deadLetter($this->message, 'MBC_RegistrationMobile_Service_MobileCommons->process()->mobileServiceObject->profiles_update Error', $status['error']->attributes()->{'message'});
         $this->messageBroker->sendNack($payload, false, false);
-        $this->statHat->ezCount('MBC_RegistrationMobile_Service_MobileCommons: profiles_update error: ' . $status['error']->attributes()->{'message'});
+        $this->statHat->ezCount('mbc-registration-mobile: MBC_RegistrationMobile_Service_MobileCommons: profiles_update error: ' . $status['error']->attributes()->{'message'}, 1);
         throw new Exception($status['error']->attributes()->{'message'});
       }
       else {
         $this->messageBroker->sendAck($payload);
-        $this->statHat->ezCount('MBC_RegistrationMobile_Service_MobileCommons: profiles_update success');
+        $this->statHat->ezCount('mbc-registration-mobile: MBC_RegistrationMobile_Service_MobileCommons: profiles_update success', 1);
       }
 
       echo '-> MBC_RegistrationMobile_Service_MobileCommons->process: ' . $this->message['phone_number'] . ' -------', PHP_EOL;
     }
     catch (Exception $e) {
-      $this->statHat->ezCount('MBC_RegistrationMobile_Service_MobileCommons: profiles_update error');
+      $this->statHat->ezCount('mbc-registration-mobile: MBC_RegistrationMobile_Service_MobileCommons: profiles_update error', 1);
       throw new Exception($e->getMessage());
     }
 
@@ -198,7 +198,7 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
       }
     }
     catch (Exception $e) {
-      $this->statHat->ezCount('MBC_RegistrationMobile_Service_MobileCommons: object connection error');
+      $this->statHat->ezCount('mbc-registration-mobile: MBC_RegistrationMobile_Service_MobileCommons: object connection error', 1);
       throw new Exception($e->getMessage());
     }
 
