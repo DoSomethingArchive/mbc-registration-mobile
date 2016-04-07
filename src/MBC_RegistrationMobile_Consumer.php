@@ -69,6 +69,13 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
         echo '- Nack sent to requeue message: ' . date('j D M Y G:i:s T'), PHP_EOL . PHP_EOL;
         $this->statHat->ezCount('mbc-registration-mobile: MBC_RegistrationMobile_Consumer: Exception: Failed to connect', 1);
       }
+      elseif (!(strpos($e->getMessage(), 'Bad response - HTTP Code:500') === false)) {
+        echo '** COnnection error, http code 500... waiting before retrying: ' . date('j D M Y G:i:s T') . ' - getMessage(): ' . $e->getMessage(), PHP_EOL;
+        sleep(self::RETRY_SECONDS);
+        $this->messageBroker->sendNack($this->message['payload']);
+        echo '- Nack sent to requeue message: ' . date('j D M Y G:i:s T'), PHP_EOL . PHP_EOL;
+        $this->statHat->ezCount('mbc-registration-mobile: MBC_RegistrationMobile_Consumer: Exception: Bad response - HTTP Code:500', 1);
+      }
       else {
         echo '- Not timeout or connection error, message to deadLetterQueue: ' . date('j D M Y G:i:s T'), PHP_EOL;
         echo '- Error message: ' . $e->getMessage(), PHP_EOL;
