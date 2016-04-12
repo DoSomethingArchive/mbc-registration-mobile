@@ -62,6 +62,7 @@ class  MBC_RegistrationMobile_ServiceDirector
       // Voting App
       case 'CGG':
       case 'AGG':
+      case 'FLF':
 
         echo '- MBC_RegistrationMobile_ServiceDirector->serviceFactory() user_country: ' . $message['user_country'], PHP_EOL;
 
