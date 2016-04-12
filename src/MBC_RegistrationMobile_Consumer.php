@@ -105,7 +105,7 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
       return FALSE;
     }
 
-    $supportedApps = ['US', 'CA', 'CGG', 'AGG', 'MUI'];
+    $supportedApps = ['US', 'CA', 'CGG', 'AGG', 'FLF', 'MUI'];
     if (!in_array($this->message['application_id'], $supportedApps)) {
       echo '** canProcess(): Unsupported application: ' . $this->message['application_id'], PHP_EOL;
       parent::reportErrorPayload();
