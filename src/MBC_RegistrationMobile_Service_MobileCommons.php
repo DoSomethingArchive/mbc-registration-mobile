@@ -132,6 +132,12 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
     if (isset($message['original']['afterschool_optin'])) {
       $this->message['afterschool_optin'] = $message['original']['afterschool_optin'];
     }
+
+    // FLF 2016 custom fields
+    if (strtoupper($message['application_id']) == 'FLF' && isset($message['original']['candidate_name'])) {
+      $this->message['Voting2016-4-Legged-Finisher'] = $message['original']['candidate_name'];
+    }
+
   }
 
   /**
