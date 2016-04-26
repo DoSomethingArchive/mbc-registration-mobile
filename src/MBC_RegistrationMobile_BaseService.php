@@ -86,6 +86,7 @@ abstract class MBC_RegistrationMobile_BaseService
     $this->messageBroker_deadLetter = $this->mbConfig->getProperty('messageBroker_deadLetter');
     $this->statHat = $this->mbConfig->getProperty('statHat');
     $this->toolbox = $this->mbConfig->getProperty('mbToolbox');
+    $this->mbToolbox = $this->mbConfig->getProperty('mbToolbox');
 
     $this->message = $message;
     $targetCountry = $this->targetCountryRules($message);
