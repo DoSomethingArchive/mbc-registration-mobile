@@ -8,6 +8,7 @@ namespace DoSomething\MBC_RegistrationMobile;
 use DoSomething\StatHat\Client as StatHat;
 use DoSomething\MB_Toolbox\MB_Toolbox;
 use DoSomething\MB_Toolbox\MB_Configuration;
+use DoSomething\MB_Toolbox\MB_MobileCommons;
 use \Exception;
 
 /*
@@ -27,6 +28,7 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
 
     parent::__construct($message);
     $this->mobileServiceName = 'Mobile Commons';
+    $this->mbMobileCommons = $this->mbConfig->getProperty('mbMobileCommons');
   }
 
   /**
@@ -135,6 +137,17 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
 
     // FLF 2016 custom fields
     if (strtoupper($message['application_id']) == 'FLF' && isset($message['original']['candidate_name'])) {
+
+      // Check for existing account
+      $existingAccount = $this->mbMobileCommons->checkExisting($this->mobileServiceObject, $this->message['phone_number']);
+      if (!$existingAccount) {
+        $this->message['source'] = 'Voting2016-4-Legged-Finisher';
+      }
+      else {
+        // Don't overwrite current source setting of existing account
+        unset($this->message['source']);
+      }
+
       $this->message['Voting2016-4-Legged-Finisher'] = $message['original']['candidate_name'];
     }
 
