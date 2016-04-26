@@ -6,6 +6,7 @@
 use DoSomething\MB_Toolbox\MB_Configuration;
 use DoSomething\StatHat\Client as StatHat;
 use DoSomething\MB_Toolbox\MB_Toolbox;
+use DoSomething\MB_Toolbox\MB_MobileCommons;
 use DoSomething\MB_Toolbox\MB_RabbitMQManagementAPI;
 
 // Load configuration settings common to the Message Broker system
@@ -85,6 +86,7 @@ $mbConfig->setProperty('statHat', new StatHat([
 ]));
 
 $mbConfig->setProperty('mbToolbox', new MB_Toolbox());
+$mbConfig->setProperty('mbMobileCommons', new MB_MobileCommons());
 $mbConfig->setProperty('mbRabbitMQManagementAPI', new MB_RabbitMQManagementAPI([
   'domain' => getenv("MB_RABBITMQ_MANAGEMENT_API_HOST"),
   'port' => getenv('MB_RABBITMQ_MANAGEMENT_API_PORT'),
