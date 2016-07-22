@@ -17,3 +17,7 @@ config.inc
 
 # Ignore PHP Storm config
 .idea
+
+# Ignore NPM files
+npm-debug.log
+node_modules
