@@ -42,10 +42,7 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
 
         $this->logConsumption(['mobile']);
         $this->setter($this->message);
-        $params = [
-            'mobileMessage' => $this->mobileMessage,
-        ];
-        $this->process();
+        $this->process($this->mobileMessage);
         // Cleanup for next message
         unset($this->mobileMessage);
         $this->statHat->ezCount('mbc-registration-mobile: MBC_RegistrationMobile_Consumer: process', 1);

@@ -16,13 +16,14 @@ require_once CONFIG_PATH . '/mb-secure-config/' . ENVIRONMENT . '/mb-secure-conf
 $mbConfig = MB_Configuration::getInstance();
 
 // Settings
-$mbConfig->setProperty('rabbit_credentials', array(
+$mbConfig->setProperty('generalSettings', []);
+$mbConfig->setProperty('rabbit_credentials', [
   'host' =>  getenv("RABBITMQ_HOST"),
   'port' => getenv("RABBITMQ_PORT"),
   'username' => getenv("RABBITMQ_USERNAME"),
   'password' => getenv("RABBITMQ_PASSWORD"),
   'vhost' => getenv("RABBITMQ_VHOST"),
-));
+]);
 $mbConfig->setProperty('rabbitapi_credentials', [
   'host' =>  getenv("MB_RABBITMQ_MANAGEMENT_API_HOST"),
   'port' => getenv("MB_RABBITMQ_MANAGEMENT_API_PORT"),
@@ -32,45 +33,45 @@ $mbConfig->setProperty('rabbitapi_credentials', [
 $mbRabbitConfig = $mbConfig->constructRabbitConfig('transactionalExchange', array('mobileCommonsQueue'));
 $mbConfig->setProperty('rabbit_config', $mbRabbitConfig);
 
-$mbConfig->setProperty('mobileCommons_config', array(
-  'US' => array(
+$mbConfig->setProperty('mobileCommons_config', [
+  'US' => [
     'username' => getenv("MOBILE_COMMONS_US_USER"),
     'password' => getenv("MOBILE_COMMONS_US_PASSWORD"),
     'company_key' => getenv("MOBILE_COMMONS_US_COMPANY_KEY"),
-  ),
-  'MUI' => array(
+  ],
+  'MUI' => [
     'username' => getenv("MOBILE_COMMONS_US_USER"),
     'password' => getenv("MOBILE_COMMONS_US_PASSWORD"),
     'company_key' => getenv("MOBILE_COMMONS_US_COMPANY_KEY"),
-  ),
-  'CGG' => array(
+  ],
+  'CGG' => [
     'username' => getenv("MOBILE_COMMONS_US_USER"),
     'password' => getenv("MOBILE_COMMONS_US_PASSWORD"),
     'company_key' => getenv("MOBILE_COMMONS_US_COMPANY_KEY"),
-  ),
-  'AGG' => array(
+  ],
+  'AGG' => [
     'username' => getenv("MOBILE_COMMONS_US_USER"),
     'password' => getenv("MOBILE_COMMONS_US_PASSWORD"),
     'company_key' => getenv("MOBILE_COMMONS_US_COMPANY_KEY"),
-  ),
-  'FLF' => array(
+  ],
+  'FLF' => [
     'username' => getenv("MOBILE_COMMONS_US_USER"),
     'password' => getenv("MOBILE_COMMONS_US_PASSWORD"),
     'company_key' => getenv("MOBILE_COMMONS_US_COMPANY_KEY"),
-  ),
-  'CA' => array(
+  ],
+  'CA' => [
     'username' => getenv("MOBILE_COMMONS_CA_USER"),
     'password' => getenv("MOBILE_COMMONS_CA_PASSWORD"),
     'company_key' => getenv("MOBILE_COMMONS_CA_COMPANY_KEY"),
-  )
-));
+  ]
+]);
 
 $mobileConfig = $mbConfig->gatherSettings('mobile');
-$mbConfig->setProperty('communicatePro_config', array(
+$mbConfig->setProperty('communicatePro_config', [
   'settings' => $mobileConfig->mGage,
   'username' => getenv("COMMUNICATE_PRO_USER"),
   'password' => getenv("COMMUNICATE_PRO_PASSWORD")
-));
+]);
 
 // Create untility objects for access anywhere within the application as a single instance
 $messageBrokerConfig = $mbConfig->constructRabbitConfig('transactionalExchange', ['mobileCommonsQueue']);
