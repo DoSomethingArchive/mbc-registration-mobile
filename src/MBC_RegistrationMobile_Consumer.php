@@ -206,7 +206,7 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
       $this->mobileMessage['birthdate'] = date('Y-m-d', $message['birthdate_timestamp']);
     }
     if (isset($payloadDetails['birthdate_timestamp'])) {
-      $this->mobileMessage['BirthYear'] = date('Y', $message['birthdate_timestamp']);
+      $this->mobileMessage['birthyear'] = date('Y', $message['birthdate_timestamp']);
     }
 
     if (isset($message['address1'])) {
@@ -238,17 +238,17 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
    */
   protected function process($params) {
 
-    $mobileServiceDirector = new MBC_RegistrationMobile_ServiceDirector($params['mobileMessage']);
+    $mobileServiceDirector = new MBC_RegistrationMobile_ServiceDirector($params);
     $mobileService = $mobileServiceDirector->getService();
 
-    if ($mobileService->canProcess($params['mobileMessage'])) {
+    if ($mobileService->canProcess($params)) {
 
       try {
-        $mobileService->setter($params['mobileMessage']);
+        $mobileService->setter($params);
         $mobileService->process();
       }
       catch(Exception $e) {
-        echo '** process(): Error sending mobile number: ' . $params['mobileMessage']['mobile'] . ' to mobile ' .
+        echo '** process(): Error sending mobile number: ' . $params['mobile'] . ' to mobile ' .
             $mobileService->mobileServiceName . ' service for user signup.', PHP_EOL;
         throw $e;
       }
