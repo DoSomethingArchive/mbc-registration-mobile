@@ -38,11 +38,16 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
 
     try {
 
-      if ($this->canProcess()) {
+      if ($this->canProcess($this->message)) {
 
         $this->logConsumption(['mobile']);
         $this->setter($this->message);
+        $params = [
+            'mobileMessage' => $this->mobileMessage,
+        ];
         $this->process();
+        // Cleanup for next message
+        unset($this->mobileMessage);
         $this->statHat->ezCount('mbc-registration-mobile: MBC_RegistrationMobile_Consumer: process', 1);
 
         // Ack in Service process() due to nested try/catch
@@ -102,33 +107,35 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
    * Method to determine if message can / should be processed. Conditions based on business
    * logic for submitted mobile numbers and related message values.
    *
+   * @param array $message Values to determine if message can be processed.
+   *
    * @retun boolean
    */
-  protected function canProcess() {
+  protected function canProcess($message) {
 
-    if (!isset($this->message['application_id'])) {
+    if (!isset($message['application_id'])) {
       echo '** canProcess(): application_id not set.', PHP_EOL;
       parent::reportErrorPayload();
       return FALSE;
     }
 
     $supportedApps = ['US', 'CA', 'CGG', 'AGG', 'FLF', 'MUI'];
-    if (!in_array($this->message['application_id'], $supportedApps)) {
-      echo '** canProcess(): Unsupported application: ' . $this->message['application_id'], PHP_EOL;
+    if (!in_array($message['application_id'], $supportedApps)) {
+      echo '** canProcess(): Unsupported application: ' . $message['application_id'], PHP_EOL;
       parent::reportErrorPayload();
       return FALSE;
     }
 
     $supportedCountries = ['US', 'CA', 'MX', 'BR'];
-    if (isset($this->message['user_country']) && !in_array($this->message['user_country'], $supportedCountries)) {
-      echo '** canProcess(): Unsupported user_country: ' . $this->message['user_country'], PHP_EOL;
+    if (isset($message['user_country']) && !in_array($message['user_country'], $supportedCountries)) {
+      echo '** canProcess(): Unsupported user_country: ' . $message['user_country'], PHP_EOL;
       return FALSE;
     }
-    elseif (!(isset($this->message['user_country']))) {
+    elseif (!(isset($message['user_country']))) {
       echo '** WARNING: user_country not set.', PHP_EOL;
     }
 
-    if (!isset($this->message['mobile'])) {
+    if (!isset($message['mobile'])) {
       echo '** canProcess(): mobile number was not defined.', PHP_EOL;
       parent::reportErrorPayload();
       return FALSE;
@@ -232,19 +239,20 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
    * @param array $payload
    *   The contents of the queue entry
    */
-  protected function process() {
+  protected function process($params) {
 
-    $mobileServiceDirector = new MBC_RegistrationMobile_ServiceDirector($this->mobileMessage);
+    $mobileServiceDirector = new MBC_RegistrationMobile_ServiceDirector($params['mobileMessage']);
     $mobileService = $mobileServiceDirector->getService();
 
-    if ($mobileService->canProcess($this->mobileMessage)) {
+    if ($mobileService->canProcess($params['mobileMessage'])) {
 
       try {
-        $mobileService->setter($this->mobileMessage);
+        $mobileService->setter($params['mobileMessage']);
         $mobileService->process();
       }
       catch(Exception $e) {
-        echo '** process(): Error sending mobile number: ' . $this->mobileMessage['mobile'] . ' to mobile ' . $mobileService->mobileServiceName . ' service for user signup.', PHP_EOL;
+        echo '** process(): Error sending mobile number: ' . $params['mobileMessage']['mobile'] . ' to mobile ' .
+            $mobileService->mobileServiceName . ' service for user signup.', PHP_EOL;
         throw $e;
       }
 
@@ -253,9 +261,6 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
       echo 'Service canProcess() failed, removing from queue.', PHP_EOL;
       $this->messageBroker->sendAck($this->mobileMessage['payload']);
     }
-
-    // Cleanup for next message
-    unset($this->mobileMessage);
   }
 
   /**
