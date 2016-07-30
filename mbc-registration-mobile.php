@@ -6,7 +6,7 @@
  * transactionalExchange. The mbp-registration-mobile application produces user
  * entries in Mobile Commons based the contents of the queue.
  */
-    
+
 use DoSomething\MBC_RegistrationMobile\MBC_RegistrationMobile_Consumer;
 
 date_default_timezone_set('America/New_York');
@@ -36,7 +36,7 @@ require_once __DIR__ . '/mbc-registration-mobile.config.inc';
 // Kick off - block, wait for messages in queue
 echo '------- mbc-registration-mobile START - ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
 $mb = $mbConfig->getProperty('messageBroker');
-$mb->consumeMessage(array(new MBC_RegistrationMobile_Consumer(), 'consumeRegistrationMobileQueue'), QOS_SIZE);
+$mb->consume(array(new MBC_RegistrationMobile_Consumer(), 'consumeRegistrationMobileQueue'), QOS_SIZE);
 echo '------- mbc-registration-mobile END - ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
     
 /**

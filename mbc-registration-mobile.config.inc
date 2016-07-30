@@ -3,6 +3,7 @@
  * Message Broker configuration settings for mbc-registration-mobile
  */
 
+use DoSomething\MessageBroker\MessageBroker;
 use DoSomething\MB_Toolbox\MB_Configuration;
 use DoSomething\StatHat\Client as StatHat;
 use DoSomething\MB_Toolbox\MB_Toolbox;
