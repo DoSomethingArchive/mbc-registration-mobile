@@ -58,14 +58,14 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
     catch(Exception $e) {
 
       if (!(strpos($e->getMessage(), 'Connection timed out') === false)) {
-        echo '** Connection timed out... waiting before retrying: ' . date('j D M Y G:i:s T') . ' - getMessage(): ' . $e-getMessage(), PHP_EOL;
+        echo '** Connection timed out... waiting before retrying: ' . date('j D M Y G:i:s T') . ' - getMessage(): ' . $e->getMessage(), PHP_EOL;
         $this->statHat->ezCount('mbc-registration-mobile: MBC_RegistrationMobile_Consumer: Exception: Connection timed out', 1);
         sleep(self::RETRY_SECONDS);
         $this->messageBroker->sendNack($this->message['payload']);
         echo '- Nack sent to requeue message: ' . date('j D M Y G:i:s T'), PHP_EOL . PHP_EOL;
       }
       elseif (!(strpos($e->getMessage(), 'Operation timed out') === false)) {
-        echo '** Operation timed out... waiting before retrying: ' . date('j D M Y G:i:s T') . ' - getMessage(): ' . $e-getMessage(), PHP_EOL;
+        echo '** Operation timed out... waiting before retrying: ' . date('j D M Y G:i:s T') . ' - getMessage(): ' . $e->getMessage(), PHP_EOL;
         $this->statHat->ezCount('mbc-registration-mobile: MBC_RegistrationMobile_Consumer: Exception: Operation timed out', 1);
         sleep(self::RETRY_SECONDS);
         $this->messageBroker->sendNack($this->message['payload']);
