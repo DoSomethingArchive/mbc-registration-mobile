@@ -21,7 +21,7 @@ if (isset($_GET['environment']) && allowedEnviroment($_GET['environment'])) {
     define('ENVIRONMENT', $_GET['environment']);
 } elseif (isset($argv[1])&& allowedEnviroment($argv[1])) {
     define('ENVIRONMENT', $argv[1]);
-} elseif ($env = loadConfig()) {
+} elseif ($env = loadConfig() && defined('ENVIRONMENT')) {
     echo 'environment.php exists, ENVIRONMENT defined as: ' . ENVIRONMENT, PHP_EOL;
 } elseif (allowedEnviroment('local')) {
     define('ENVIRONMENT', 'local');
@@ -38,7 +38,7 @@ echo '------- mbc-registration-mobile START - ' . date('j D M Y G:i:s T') . ' --
 $mb = $mbConfig->getProperty('messageBroker');
 $mb->consume(array(new MBC_RegistrationMobile_Consumer(), 'consumeRegistrationMobileQueue'), QOS_SIZE);
 echo '------- mbc-registration-mobile END - ' . date('j D M Y G:i:s T') . ' -------', PHP_EOL;
-    
+
 /**
  * Test if environment setting is a supported value.
  *
@@ -48,17 +48,17 @@ echo '------- mbc-registration-mobile END - ' . date('j D M Y G:i:s T') . ' ----
  */
 function allowedEnviroment($setting)
 {
-    
+
     $allowedEnviroments = [
         'local',
         'dev',
         'prod'
     ];
-    
+
     if (in_array($setting, $allowedEnviroments)) {
         return true;
     }
-    
+
     return false;
 }
 
@@ -68,12 +68,12 @@ function allowedEnviroment($setting)
  * @return boolean
  */
 function loadConfig() {
-    
+
     // Check that environment config file exists
-    if (!file_exists (environment.php)) {
+    if (!file_exists('environment.php')) {
         return false;
     }
     include('./environment.php');
-    
+
     return true;
 }
