@@ -123,6 +123,20 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
       $this->message['Date of Birth'] = $message['birthdate'];
     }
 
+    // Additional fields for Lose Your V-Card campaign (2016).
+    // https://www.dosomething.org/us/campaigns/lose-your-v-card
+    // https://trello.com/c/tZMqE6kc/110-lose-your-v-card-signup-email-sms-data-import
+    if (!empty($message['northstar_id'])) {
+      $baseUrl = 'https://www.dosomething.org/us/campaigns/lose-your-v-card';
+      $this->message['vcard_share_url_full']  = $baseUrl;
+      $this->message['vcard_share_url_full'] .= '?source=user/';
+      $this->message['vcard_share_url_full'] .= $message['northstar_id'];
+
+      // Wrapping URL in parentesses tells Liquid to automatically shorten it.
+      $this->message['vcard_share_url_full'] =
+        '((' . $this->message['vcard_share_url_full'] . '))';
+    }
+
     // CGG - custom profile fields
     if (strtoupper($message['application_id']) == 'CGG' && isset($message['original']['candidate_name'])) {
       $this->message['CGG2015_1st_vote'] = $message['original']['candidate_name'];
