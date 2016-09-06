@@ -118,6 +118,11 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
       $this->message['country'] = $message['country'];
     }
 
+    // Additional custom 'Date of Birth' field.
+    if (!empty($message['birthdate'])) {
+      $this->message['Date of Birth'] = $message['birthdate'];
+    }
+
     // CGG - custom profile fields
     if (strtoupper($message['application_id']) == 'CGG' && isset($message['original']['candidate_name'])) {
       $this->message['CGG2015_1st_vote'] = $message['original']['candidate_name'];
