@@ -152,6 +152,10 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
     $this->mobileMessage['original'] = $message['original'];
     $this->mobileMessage['payload'] = $message['payload'];
 
+    // Northstar integration.
+    if (!empty($message['northstar_id'])) {
+      $this->mobileMessage['northstar_id'] = $message['northstar_id'];
+    }
     if (isset($message['application_id'])) {
       $this->mobileMessage['application_id'] = $message['application_id'];
     }
