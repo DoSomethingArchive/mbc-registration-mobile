@@ -95,7 +95,7 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
 
     // @todo: Throttle the number of consumers running. Based on the number of messages
     // waiting to be processed start / stop consumers. Make "reactive"!
-    $queueStatus = parent::queueStatus('transactionalQueue');
+    $queueStatus = parent::queueStatus('mobileCommonsQueue');
 
     echo  PHP_EOL . '------ mbc-registration-mobile - MBC_RegistrationMobile_Consumer->consumeRegistrationMobileQueue() - ' . date('j D M Y G:i:s T') . ' END ------', PHP_EOL . PHP_EOL;
   }
