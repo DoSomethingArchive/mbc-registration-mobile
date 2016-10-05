@@ -88,8 +88,13 @@ class MBC_RegistrationMobile_Consumer extends MB_Toolbox_BaseConsumer
       else {
         echo '- Not timeout or connection error, message to deadLetterQueue: ' . date('j D M Y G:i:s T'), PHP_EOL;
         echo '- Error message: ' . $e->getMessage(), PHP_EOL;
+
+        // Uknown exception, save the message to deadLetter queue.
         $this->statHat->ezCount('mbc-registration-mobile: MBC_RegistrationMobile_Consumer: Exception: deadLetter', 1);
         parent::deadLetter($this->message, 'MBC_RegistrationMobile_Consumer->consumeRegistrationMobileQueue() Error', $e->getMessage());
+
+        // Send Negative Acknowledgment, don't requeue the message.
+        $this->messageBroker->sendNack($this->message['payload'], false, false);
       }
     }
 
