@@ -9,6 +9,7 @@ use DoSomething\StatHat\Client as StatHat;
 use DoSomething\MB_Toolbox\MB_Toolbox;
 use DoSomething\MB_Toolbox\MB_MobileCommons;
 use DoSomething\MB_Toolbox\MB_RabbitMQManagementAPI;
+use DoSomething\Gateway\Gambit;
 
 // Load configuration settings common to the Message Broker system
 // symlinks in the project directory point to the actual location of the files
@@ -96,3 +97,10 @@ $mbConfig->setProperty('mbRabbitMQManagementAPI', new MB_RabbitMQManagementAPI([
   'username' => getenv('MB_RABBITMQ_MANAGEMENT_API_USERNAME'),
   'password' => getenv('MB_RABBITMQ_MANAGEMENT_API_PASSWORD')
 ]));
+
+// Gambit.
+$gambit = new Gambit([
+  'url'    => getenv('GAMBIT_API_URL'),
+  'apiKey' => getenv('GAMBIT_API_KEY'),
+]);
+$mbConfig->setProperty('gambit', $gambit);
