@@ -5,6 +5,7 @@
  */
 namespace DoSomething\MBC_RegistrationMobile;
 
+use DoSomething\Gateway\Gambit;
 use DoSomething\StatHat\Client as StatHat;
 use DoSomething\MB_Toolbox\MB_Toolbox;
 use DoSomething\MB_Toolbox\MB_Configuration;
@@ -29,6 +30,7 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
     parent::__construct($message);
     $this->mobileServiceName = 'Mobile Commons';
     $this->mbMobileCommons = $this->mbConfig->getProperty('mbMobileCommons');
+    $this->gambit = $this->mbConfig->getProperty('gambit');
   }
 
   /**
@@ -176,34 +178,11 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
    * Process message from consumed queue.
    */
   public function process() {
-
-    $payload = $this->message['payload'];
-    unset($this->message['payload']);
-    unset($this->message['original']);
-
-    try {
-
-      $status = (array)$this->mobileServiceObject->profiles_update($this->message);
-      if (isset($status['error'])) {
-        echo '- Error - ' . $status['error']->attributes()->{'message'} , PHP_EOL;
-        echo '  Submitted: ' . print_r($this->message, TRUE), PHP_EOL;
-        parent::deadLetter($this->message, 'MBC_RegistrationMobile_Service_MobileCommons->process()->mobileServiceObject->profiles_update Error', $status['error']->attributes()->{'message'});
-        $this->messageBroker->sendNack($payload, false, false);
-        $this->statHat->ezCount('mbc-registration-mobile: MBC_RegistrationMobile_Service_MobileCommons: profiles_update error: ' . $status['error']->attributes()->{'message'}, 1);
-        throw new Exception($status['error']->attributes()->{'message'});
-      }
-      else {
-        $this->messageBroker->sendAck($payload);
-        $this->statHat->ezCount('mbc-registration-mobile: MBC_RegistrationMobile_Service_MobileCommons: profiles_update success', 1);
-      }
-
-      echo '-> MBC_RegistrationMobile_Service_MobileCommons->process: ' . $this->message['phone_number'] . ' -------', PHP_EOL;
+    if ($this->shouldBeProcessedOnGambit()) {
+      $this->processOnGambit();
+    } else {
+      $this->processOnMobileCommons();
     }
-    catch (Exception $e) {
-      $this->statHat->ezCount('mbc-registration-mobile: MBC_RegistrationMobile_Service_MobileCommons: profiles_update error', 1);
-      throw new Exception($e->getMessage());
-    }
-
   }
 
   /**
@@ -241,6 +220,78 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
     }
 
     return $mobileServiceObject;
+  }
+
+  private function shouldBeProcessedOnGambit() {
+    $original = &$this->message['original'];
+
+    // Ignore other activities than signup.
+    if (empty($original['activity']) || $original['activity'] !== 'campaign_signup') {
+      return false;
+    }
+
+    // Only with existing campaign id and signup id.
+    if (empty($original['event_id']) || empty($original['signup_id'])) {
+      return false;
+    }
+
+    $campaign_id = (int) $original['event_id'];
+
+    // Only if enabled on Gambit.
+    // Todo: cache.
+    $gambitCampaign = false;
+    try {
+      $gambitCampaign = $this->gambit->getCampaign($campaign_id);
+    } catch (Exception $e) {
+      echo 'Can\'t access Gambit: ' . $e->getMessage();
+      return false;
+    }
+
+    if (empty($gambitCampaign)) {
+      return false;
+    }
+
+    // Todo: check id.
+    return true;
+  }
+
+  private function processOnGambit() {
+    $signup_id = $this->message['original']['signup_id'];
+    $signup_source = !empty($this->message['source'])
+      ? $this->message['source'] : Gambit::SIGNUP_SOURCE_FALLBACK;
+
+    return $this->gambit->createSignup($signup_id, $signup_source);
+  }
+
+
+
+  private function processOnMobileCommons() {
+    $payload = $this->message['payload'];
+    unset($this->message['payload']);
+    unset($this->message['original']);
+
+    try {
+
+      $status = (array)$this->mobileServiceObject->profiles_update($this->message);
+      if (isset($status['error'])) {
+        echo '- Error - ' . $status['error']->attributes()->{'message'} , PHP_EOL;
+        echo '  Submitted: ' . print_r($this->message, TRUE), PHP_EOL;
+        parent::deadLetter($this->message, 'MBC_RegistrationMobile_Service_MobileCommons->process()->mobileServiceObject->profiles_update Error', $status['error']->attributes()->{'message'});
+        $this->messageBroker->sendNack($payload, false, false);
+        $this->statHat->ezCount('mbc-registration-mobile: MBC_RegistrationMobile_Service_MobileCommons: profiles_update error: ' . $status['error']->attributes()->{'message'}, 1);
+        throw new Exception($status['error']->attributes()->{'message'});
+      }
+      else {
+        $this->messageBroker->sendAck($payload);
+        $this->statHat->ezCount('mbc-registration-mobile: MBC_RegistrationMobile_Service_MobileCommons: profiles_update success', 1);
+      }
+
+      echo '-> MBC_RegistrationMobile_Service_MobileCommons->process: ' . $this->message['phone_number'] . ' -------', PHP_EOL;
+    }
+    catch (Exception $e) {
+      $this->statHat->ezCount('mbc-registration-mobile: MBC_RegistrationMobile_Service_MobileCommons: profiles_update error', 1);
+      throw new Exception($e->getMessage());
+    }
   }
 
 }
