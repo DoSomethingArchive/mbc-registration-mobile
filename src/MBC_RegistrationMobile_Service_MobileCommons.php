@@ -222,6 +222,9 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
     return $mobileServiceObject;
   }
 
+  /**
+   * Determines whether processing should be done on Gambit.
+   */
   private function shouldBeProcessedOnGambit() {
     $original = &$this->message['original'];
 
@@ -255,16 +258,39 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
     return true;
   }
 
+  /**
+   * Gambit processing.
+   */
   private function processOnGambit() {
+    $payload = $this->message['payload'];
+
     $signup_id = $this->message['original']['signup_id'];
     $signup_source = !empty($this->message['source'])
       ? $this->message['source'] : Gambit::SIGNUP_SOURCE_FALLBACK;
 
-    return $this->gambit->createSignup($signup_id, $signup_source);
+    echo '-> Processing signup on Gambit: sid = ' . $signup_id
+      . ', source = ' . $signup_source . PHP_EOL;
+
+    try {
+      $result = $this->gambit->createSignup($signup_id, $signup_source);
+      if ($result) {
+        $this->messageBroker->sendAck($payload);
+      } else {
+        $error = '-> Gambit unknown error.' . PHP_EOL;
+        echo $error;
+        parent::deadLetter($this->message, 'processOnGambit', $error);
+        $this->messageBroker->sendNack($payload, false, false);
+      }
+    } catch (Exception $e) {
+      echo '-> Gambit error: ' . $e->getMessage() . PHP_EOL;
+      parent::deadLetter($this->message, 'processOnGambit', $e);
+      $this->messageBroker->sendNack($payload, false, false);
+    }
   }
 
-
-
+  /**
+   * Mobile commons processing.
+   */
   private function processOnMobileCommons() {
     $payload = $this->message['payload'];
     unset($this->message['payload']);
