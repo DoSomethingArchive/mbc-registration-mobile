@@ -182,6 +182,7 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
         . ' nor Gambit CampaignBot Campaign is available.'
         . PHP_EOL;
       parent::reportErrorPayload();
+      $this->messageBroker->sendNack($this->message['payload'], false, false);
       return false;
     }
     return true;
