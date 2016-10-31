@@ -56,6 +56,16 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
       echo '** Service_MobileCommons canProcess(): Invalid phone number based on  North American Numbering Plan standard: ' .  $message['mobile'], PHP_EOL;
       return FALSE;
     }
+
+    // Ignore activities.
+    if (!empty($message['original']['activity'])) {
+      $ignoreActivities = ['campaign_signup_single'];
+      if (in_array($message['original']['activity'], $ignoreActivities)) {
+        echo 'Ignore activity ' . $message['original']['activity'] . '.' . PHP_EOL;
+        return FALSE;
+      }
+    }
+
     return TRUE;
   }
 
