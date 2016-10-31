@@ -179,7 +179,7 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
     } else {
       $error = '** Service_MobileCommons process(): Can\'t dispatch message to '
         . $this->message['phone_number'] . ' , Neither Mobile Commons Campaign'
-        . ' nor Gambit CampaignBot Campaign is available.'
+        . ' nor Gambit CampaignBot Campaign is available.';
       echo $error . PHP_EOL;
       parent::reportErrorPayload();
       parent::deadLetter($this->message, 'process', $error);
