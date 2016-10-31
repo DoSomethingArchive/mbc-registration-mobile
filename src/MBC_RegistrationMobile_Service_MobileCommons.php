@@ -265,7 +265,27 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
     }
 
     if (empty($gambitCampaign)) {
+      echo '**  Gambit * Incorrect campaign.';
       return false;
+    }
+
+    // If Campaignbot is not enabled for the campaign:
+    if ($gambitCampaign->campaignbot != true) {
+      echo '** Gambit * Campaignbot is not enabled for campaign id '
+        . $campaign_id . ', ignoring.' . PHP_EOL;
+      return false;
+    }
+
+    // Ignore sources.
+    if (!empty($original['source'])) {
+      $ignoredSources = [
+        // Ignore sms signup, those has aleady been processed on Gambit.
+        'sms-mobilecommons',
+      ];
+      if (in_array($original['source'], $ignoredSources)) {
+        echo '** Gambit * Ignore source: ' . $original['source'] . '.' . PHP_EOL;
+        return false;
+      }
     }
 
     // Todo: check id.
