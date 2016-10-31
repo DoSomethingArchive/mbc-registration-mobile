@@ -52,7 +52,8 @@ function allowedEnviroment($setting)
     $allowedEnviroments = [
         'local',
         'dev',
-        'prod'
+        'thor',
+        'prod',
     ];
 
     if (in_array($setting, $allowedEnviroments)) {
