@@ -56,12 +56,6 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
       echo '** Service_MobileCommons canProcess(): Invalid phone number based on  North American Numbering Plan standard: ' .  $message['mobile'], PHP_EOL;
       return FALSE;
     }
-    if (!isset($message['service_path_id'])) {
-      echo '** Service_MobileCommons canProcess(): service_path_id not set for mobile: ' . $message['mobile'] . '. Mobile Commons requires service_path_id (opt in) for processing.', PHP_EOL;
-      parent::reportErrorPayload();
-      return FALSE;
-    }
-
     return TRUE;
   }
 
@@ -180,9 +174,17 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
   public function process() {
     if ($this->shouldBeProcessedOnGambit()) {
       $this->processOnGambit();
-    } else {
+    } elseif (!empty($this->message['opt_in_path_id'])) {
       $this->processOnMobileCommons();
+    } else {
+      echo '** Service_MobileCommons process(): Can\'t dispatch message to '
+        . $this->message['phone_number'] .
+        . ', niether MobileCommons nor Gambit campaign isn\'t available.'
+        . PHP_EOL;
+      parent::reportErrorPayload();
+      return false;
     }
+    return true;
   }
 
   /**
