@@ -177,11 +177,13 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
     } elseif (!empty($this->message['opt_in_path_id'])) {
       $this->processOnMobileCommons();
     } else {
-      echo '** Service_MobileCommons process(): Can\'t dispatch message to '
+      $error = '** Service_MobileCommons process(): Can\'t dispatch message to '
         . $this->message['phone_number'] . ' , Neither Mobile Commons Campaign'
         . ' nor Gambit CampaignBot Campaign is available.'
-        . PHP_EOL;
+      echo $error . PHP_EOL;
       parent::reportErrorPayload();
+      parent::deadLetter($this->message, 'process', $error);
+      $this->messageBroker->sendNack($this->message['payload'], false, false);
       return false;
     }
     return true;
