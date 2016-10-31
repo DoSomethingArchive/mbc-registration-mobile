@@ -1,5 +1,6 @@
 # Ignore configuration files that may contain sensitive information.
 /messagebroker-config
+/environment.php
 
 # Ignore composer working files
 composer.phar
