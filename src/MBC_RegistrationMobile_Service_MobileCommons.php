@@ -242,7 +242,11 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
     $original = &$this->message['original'];
 
     // Ignore other activities than signup.
-    if (empty($original['activity']) || $original['activity'] !== 'campaign_signup') {
+    $allowedActivities  = [
+      'campaign_signup',
+      'user_welcome-niche',
+    ];
+    if (empty($original['activity']) || !in_array($original['activity'], $allowedActivities)) {
       return false;
     }
 
