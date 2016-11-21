@@ -145,7 +145,7 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
 
     // CGG - custom profile fields
     if (strtoupper($message['application_id']) == 'CGG' && isset($message['original']['candidate_name'])) {
-      $this->message['CGG2015_1st_vote'] = $message['original']['candidate_name'];
+      $this->message['cgg2016_1st_vote'] = $message['original']['candidate_name'];
     }
 
     // AfterSchool user import - custom profile fields
