@@ -144,6 +144,7 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
     }
 
     // CGG - custom profile fields
+    // Used in https://secure.mcommons.com/campaigns/151777/opt_in_paths/219619
     if (strtoupper($message['application_id']) == 'CGG' && isset($message['original']['candidate_name'])) {
       $this->message['cgg2016_1st_vote'] = $message['original']['candidate_name'];
     }
