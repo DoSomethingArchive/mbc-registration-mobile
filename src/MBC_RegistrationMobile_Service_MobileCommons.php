@@ -144,8 +144,9 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
     }
 
     // CGG - custom profile fields
+    // Used in https://secure.mcommons.com/campaigns/151777/opt_in_paths/219619
     if (strtoupper($message['application_id']) == 'CGG' && isset($message['original']['candidate_name'])) {
-      $this->message['CGG2015_1st_vote'] = $message['original']['candidate_name'];
+      $this->message['cgg2016_1st_vote'] = $message['original']['candidate_name'];
     }
 
     // AfterSchool user import - custom profile fields
@@ -158,22 +159,6 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
     }
     if (isset($message['original']['afterschool_optin'])) {
       $this->message['afterschool_optin'] = $message['original']['afterschool_optin'];
-    }
-
-    // FLF 2016 custom fields
-    if (strtoupper($message['application_id']) == 'FLF' && isset($message['original']['candidate_name'])) {
-
-      // Check for existing account
-      $existingAccount = $this->mbMobileCommons->checkExisting($this->mobileServiceObject, $this->message['phone_number']);
-      if (!$existingAccount) {
-        $this->message['source'] = 'Voting2016-4-Legged-Finisher';
-      }
-      else {
-        // Don't overwrite current source setting of existing account
-        unset($this->message['source']);
-      }
-
-      $this->message['Voting2016-4-Legged-Finisher'] = $message['original']['candidate_name'];
     }
 
   }
