@@ -160,22 +160,6 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
       $this->message['afterschool_optin'] = $message['original']['afterschool_optin'];
     }
 
-    // FLF 2016 custom fields
-    if (strtoupper($message['application_id']) == 'FLF' && isset($message['original']['candidate_name'])) {
-
-      // Check for existing account
-      $existingAccount = $this->mbMobileCommons->checkExisting($this->mobileServiceObject, $this->message['phone_number']);
-      if (!$existingAccount) {
-        $this->message['source'] = 'Voting2016-4-Legged-Finisher';
-      }
-      else {
-        // Don't overwrite current source setting of existing account
-        unset($this->message['source']);
-      }
-
-      $this->message['Voting2016-4-Legged-Finisher'] = $message['original']['candidate_name'];
-    }
-
   }
 
   /**
