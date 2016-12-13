@@ -66,6 +66,12 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
       }
     }
 
+    // Skip messages with explicitly disabled transactionals.
+    if (isset($message['original']['transactionals']) && $message['original']['transactionals'] === false) {
+      echo '- canProcess(), transactionals disabled.', PHP_EOL;
+      return false;
+    }
+
     return TRUE;
   }
 
