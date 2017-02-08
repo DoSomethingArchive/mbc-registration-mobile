@@ -20,6 +20,14 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
 {
 
   /**
+   * Gambit campaigns cache.
+   *
+   * @var array
+   */
+  private $gambitCampaignsCache = [];
+
+
+  /**
    * Constructor for MBC_BaseConsumer - all consumer applications should extend this base class.
    *
    * @param array $message
@@ -30,7 +38,22 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
     parent::__construct($message);
     $this->mobileServiceName = 'Mobile Commons';
     $this->mbMobileCommons = $this->mbConfig->getProperty('mbMobileCommons');
+    // $this->gambit = $this->mbConfig->getProperty('gambit');
+
+    // Cache gambit campaigns,
     $this->gambit = $this->mbConfig->getProperty('gambit');
+    $gambitCampaigns = $this->gambit->getAllCampaigns();
+
+    foreach ($gambitCampaigns as $campaign) {
+      if ($campaign->campaignbot === true) {
+        $this->gambitCampaignsCache[$campaign->id] = $campaign;
+      }
+    }
+
+    if (count($this->gambitCampaignsCache) < 1) {
+      // Basically, die.
+      throw new Exception('No gambit connection.');
+    }
   }
 
   /**
@@ -238,28 +261,25 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
       'user_welcome-niche',
     ];
     if (empty($original['activity']) || !in_array($original['activity'], $allowedActivities)) {
+      echo '** Actibity is not one of ' . json_encode($allowedActivities)
+        . ', found : ' . $original['activity'] . PHP_EOL;
       return false;
     }
 
     // Only with existing campaign id and signup id.
     if (empty($original['event_id']) || empty($original['signup_id'])) {
+      echo '** Gambit * No campaign id or signup id found in '
+        . json_encode($original) . PHP_EOL;
       return false;
     }
 
     $campaign_id = (int) $original['event_id'];
 
     // Only if enabled on Gambit.
-    // Todo: cache.
-    $gambitCampaign = false;
-    try {
-      $gambitCampaign = $this->gambit->getCampaign($campaign_id);
-    } catch (Exception $e) {
-      echo 'Can\'t access Gambit: ' . $e->getMessage();
-      return false;
-    }
+    $gambitCampaign = $this->gambitCampaignsCache[$campaign_id];
 
     if (empty($gambitCampaign)) {
-      echo '**  Gambit * Incorrect campaign.';
+      echo '**  Gambit * Incorrect campaign.' . PHP_EOL;
       return false;
     }
 
@@ -300,6 +320,8 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
       . ', source = ' . $signup_source . PHP_EOL;
 
     try {
+      // Sleep for 0.25 sec before hitting Gambit.
+      usleep(250000);
       $result = $this->gambit->createSignup($signup_id, $signup_source);
       if ($result) {
         $this->messageBroker->sendAck($payload);
