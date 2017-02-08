@@ -274,14 +274,14 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
 
     $campaign_id = (int) $original['event_id'];
 
-    // Get Gambit campaign from the cache.
-    $gambitCampaign = $this->gambitCampaignsCache[$campaign_id];
 
-    // Only if enabled on Gambit.
-    if (empty($gambitCampaign)) {
+    // Get Gambit campaign from the cache.
+    if (empty($this->gambitCampaignsCache[$campaign_id])) {
       echo '**  Gambit * Incorrect campaign.' . PHP_EOL;
       return false;
     }
+
+    $gambitCampaign = $this->gambitCampaignsCache[$campaign_id];
 
     // If Campaignbot is not enabled for the campaign:
     if ($gambitCampaign->campaignbot != true) {
