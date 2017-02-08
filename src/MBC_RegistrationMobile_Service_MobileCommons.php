@@ -38,9 +38,8 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
     parent::__construct($message);
     $this->mobileServiceName = 'Mobile Commons';
     $this->mbMobileCommons = $this->mbConfig->getProperty('mbMobileCommons');
-    // $this->gambit = $this->mbConfig->getProperty('gambit');
 
-    // Cache gambit campaigns,
+    // Cache gambit campaigns.
     $this->gambit = $this->mbConfig->getProperty('gambit');
     $gambitCampaigns = $this->gambit->getAllCampaigns();
 
@@ -275,9 +274,10 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
 
     $campaign_id = (int) $original['event_id'];
 
-    // Only if enabled on Gambit.
+    // Get Gambit campaign from the cache.
     $gambitCampaign = $this->gambitCampaignsCache[$campaign_id];
 
+    // Only if enabled on Gambit.
     if (empty($gambitCampaign)) {
       echo '**  Gambit * Incorrect campaign.' . PHP_EOL;
       return false;
