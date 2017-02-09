@@ -41,7 +41,7 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
 
     // Cache gambit campaigns.
     $this->gambit = $this->mbConfig->getProperty('gambit');
-    $gambitCampaigns = $this->gambit->getAllCampaigns();
+    $gambitCampaigns = $this->gambit->getAllCampaigns(['campaignbot' => true]);
 
     foreach ($gambitCampaigns as $campaign) {
       if ($campaign->campaignbot === true) {
@@ -260,7 +260,7 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
       'user_welcome-niche',
     ];
     if (empty($original['activity']) || !in_array($original['activity'], $allowedActivities)) {
-      echo '** Actibity is not one of ' . json_encode($allowedActivities)
+      echo '** Activity is not one of ' . json_encode($allowedActivities)
         . ', found : ' . $original['activity'] . PHP_EOL;
       return false;
     }
@@ -277,18 +277,12 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
 
     // Get Gambit campaign from the cache.
     if (empty($this->gambitCampaignsCache[$campaign_id])) {
-      echo '**  Gambit * Incorrect campaign.' . PHP_EOL;
-      return false;
-    }
-
-    $gambitCampaign = $this->gambitCampaignsCache[$campaign_id];
-
-    // If Campaignbot is not enabled for the campaign:
-    if ($gambitCampaign->campaignbot != true) {
       echo '** Gambit * Campaignbot is not enabled for campaign id '
         . $campaign_id . ', ignoring.' . PHP_EOL;
       return false;
     }
+
+    $gambitCampaign = $this->gambitCampaignsCache[$campaign_id];
 
     // Ignore sources.
     if (!empty($original['source'])) {
