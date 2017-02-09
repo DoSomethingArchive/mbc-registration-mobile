@@ -18,7 +18,7 @@
     "dosomething/mb-toolbox": "> 0.13.0",
     "dosomething/stathat": "2.*",
     "dosomething/mobilecommons-php": "1.0.*",
-    "dosomething/gateway": "@dev"
+    "dosomething/gateway": "1.0.0-rc17"
   },
   "require-dev": {
     "phpunit/phpunit": "4.4.*",
