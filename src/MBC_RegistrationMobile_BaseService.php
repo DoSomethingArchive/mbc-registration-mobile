@@ -6,6 +6,9 @@
 
 namespace DoSomething\MBC_RegistrationMobile;
 
+use \Exception;
+use PhpAmqpLib\Message\AMQPMessage;
+
 use DoSomething\StatHat\Client as StatHat;
 use DoSomething\MB_Toolbox\MB_Toolbox;
 use DoSomething\MB_Toolbox\MB_Configuration;
