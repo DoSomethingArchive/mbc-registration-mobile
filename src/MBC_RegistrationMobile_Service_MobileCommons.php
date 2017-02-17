@@ -44,7 +44,7 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
     $gambitCampaigns = $this->gambit->getAllCampaigns(['campaignbot' => true]);
 
     foreach ($gambitCampaigns as $campaign) {
-      if ($campaign->campaignbot === true) {
+      if ($campaign->status != 'closed') {
         $this->gambitCampaignsCache[$campaign->id] = $campaign;
       }
     }
@@ -273,7 +273,6 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
     }
 
     $campaign_id = (int) $original['event_id'];
-
 
     // Get Gambit campaign from the cache.
     if (empty($this->gambitCampaignsCache[$campaign_id])) {
