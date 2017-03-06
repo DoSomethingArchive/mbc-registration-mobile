@@ -104,3 +104,18 @@ $gambit = new Gambit([
   'apiKey' => getenv('GAMBIT_API_KEY'),
 ]);
 $mbConfig->setProperty('gambit', $gambit);
+
+echo "Loading Gambit campaigns cache..." . PHP_EOL;
+$gambitCampaigns = $gambit->getAllCampaigns(['campaignbot' => true]);
+$gambitCampaignsCache = [];
+foreach ($gambitCampaigns as $campaign) {
+  if ($campaign->status != 'closed') {
+    $gambitCampaignsCache[$campaign->id] = $campaign;
+  }
+}
+
+if (count($gambitCampaignsCache) < 1) {
+  // Basically, die.
+  throw new Exception('No gambit connection.');
+}
+$mbConfig->setProperty('gambitCampaignsCache', $gambitCampaignsCache);
