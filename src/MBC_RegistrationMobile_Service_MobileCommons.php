@@ -41,18 +41,7 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
 
     // Cache gambit campaigns.
     $this->gambit = $this->mbConfig->getProperty('gambit');
-    $gambitCampaigns = $this->gambit->getAllCampaigns(['campaignbot' => true]);
-
-    foreach ($gambitCampaigns as $campaign) {
-      if ($campaign->status != 'closed') {
-        $this->gambitCampaignsCache[$campaign->id] = $campaign;
-      }
-    }
-
-    if (count($this->gambitCampaignsCache) < 1) {
-      // Basically, die.
-      throw new Exception('No gambit connection.');
-    }
+    $this->gambitCampaignsCache = $this->mbConfig->getProperty('gambitCampaignsCache');
   }
 
   /**
