@@ -313,8 +313,8 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
       . ', source = ' . $signup_source . PHP_EOL;
 
     try {
-      // Sleep for 0.25 sec before hitting Gambit.
-      usleep(250000);
+      // Sleep for 0.1 sec before hitting Gambit.
+      usleep(10000);
       $result = $this->gambit->createSignup($signup_id, $signup_source);
       if ($result) {
         $this->messageBroker->sendAck($payload);
