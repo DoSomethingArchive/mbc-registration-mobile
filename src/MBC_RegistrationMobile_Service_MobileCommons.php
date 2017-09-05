@@ -70,7 +70,7 @@ class  MBC_RegistrationMobile_Service_MobileCommons extends MBC_RegistrationMobi
 
     // Ignore activities.
     if (!empty($message['original']['activity'])) {
-      $ignoreActivities = ['campaign_signup_single'];
+      $ignoreActivities = ['campaign_signup_single', 'user_register'];
       if (in_array($message['original']['activity'], $ignoreActivities)) {
         echo 'Ignore activity ' . $message['original']['activity'] . '.' . PHP_EOL;
         return FALSE;
